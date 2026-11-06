@@ -1,7 +1,7 @@
 // Home, New board, the board itself (with the + menu), pin detail, and Settings.
 import { useEffect, useRef, useState } from 'react'
 import { MONTH, NEXT_MONTH, TODAY, boardTitle, fileToDataUrl, friend, hasNews, timeIn, uid } from './store.js'
-import { Art, Avatar, DateSticker, Icon, PinView, StatusBar } from './ui.jsx'
+import { Art, Avatar, DateSticker, Icon, Logo, PinView, StatusBar } from './ui.jsx'
 
 // Home · Friends · + · Activity · Settings.
 export function BottomNav({ state, go, onPlus, open, current, plusLabel = 'Pin something' }) {
@@ -59,7 +59,7 @@ export function Home({ state, go }) {
     <div className="screen paper">
       <StatusBar />
       <header className="home-head">
-        <span className="spacer" />
+        <span className="spacer"><Logo size={34} color="#1f2128" /></span>
         <h1 className="scrawl">Home</h1>
         <button className="plain" onClick={() => go('settings')} aria-label="Settings"><Avatar who="me" user={user} size={34} /></button>
       </header>

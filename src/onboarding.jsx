@@ -1,7 +1,7 @@
 // Screens 00a–00i: splash, the four intro slides, account, purpose, invite, all set.
 import { useRef, useState } from 'react'
 import { FRIENDS, fileToDataUrl, timeIn, toUsername } from './store.js'
-import { Art, Avatar, Icon, StatusBar } from './ui.jsx'
+import { Art, Avatar, Icon, Logo, StatusBar } from './ui.jsx'
 
 const STEPS = 7
 
@@ -51,6 +51,7 @@ export function Splash({ onStart, onHave }) {
       <Aurora palette="splash" />
       <StatusBar />
       <div className="splash-mid">
+        <Logo size={120} color="#1f2128" animate />
         <h1 className="serif logo">Inyeon</h1>
         <p>For the little things,<br />and the people you share them with.</p>
       </div>
@@ -246,6 +247,7 @@ export function AllSet({ onOpen }) {
       <Aurora palette="allset" />
       <StatusBar />
       <div className="splash-mid">
+        <Logo size={56} color="#1f2128" className="allset-logo" />
         <h2 className="serif big">You're all set.</h2>
         <p>Your board is empty for now.<br />That's where the journey starts.</p>
       </div>

@@ -1,7 +1,7 @@
 // Recaps: the month cards, and the walk back through a month.
 import { useEffect, useRef, useState } from 'react'
 import { MONTH, MONTH_NAME, NEXT_MONTH, boardTitle, friend } from './store.js'
-import { Avatar, DateSticker, Icon, PinView, StatusBar, Toast } from './ui.jsx'
+import { Avatar, DateSticker, Icon, Logo, PinView, StatusBar, Toast } from './ui.jsx'
 import { BottomNav } from './board.jsx'
 
 const things = (n) => `${n} little ${n === 1 ? 'thing' : 'things'}`
@@ -170,7 +170,7 @@ export function RecapPlayer({ state, id, month, back }) {
       </div>
       {done && (
         <div className="summary">
-          <span className="summary-art grad grad-splash" />
+          <span className="summary-art grad grad-splash"><Logo size={44} color="#1f2128" /></span>
           <div>
             <small>Your {month === MONTH ? MONTH_NAME : month}</small>
             <p className="serif">{things(pins.length)}.{km > 0 && <><br />{km.toLocaleString()} km apart.</>}<br />Still walking.</p>

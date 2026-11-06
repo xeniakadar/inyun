@@ -431,3 +431,17 @@ img { display: block; }
 
 /* profile photos are often taller than wide: keep the face, not the middle of the picture, in the circle */
 .avatar img { object-position: 50% 26%; }
+
+/* logo */
+.logo-mark { display: block; flex: none; }
+.home-head .spacer { display: grid; place-items: center; }
+.allset-logo { margin-bottom: 6px; }
+.summary-art { display: grid; place-items: center; }
+/* opening screen: the thread draws itself, then the pin drops in, then the name appears */
+.logo-mark.draw .reveal { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw-thread 1.3s cubic-bezier(0.4, 0, 0.3, 1) 0.3s forwards; }
+.logo-mark.draw circle { transform-origin: 132.54px 80px; transform: translateY(-180px) scale(0.4); opacity: 0; animation: drop-pin 0.55s cubic-bezier(0.3, 1.5, 0.5, 1) 1.5s forwards; }
+@keyframes draw-thread { to { stroke-dashoffset: 0; } }
+@keyframes drop-pin { from { transform: translateY(-180px) scale(0.4); opacity: 0; } to { transform: none; opacity: 1; } }
+.grad-live .logo { animation-delay: 1.9s; }
+.grad-live .splash-mid p { animation-delay: 2.15s; }
+.grad-live .foot { animation-delay: 2.4s; }

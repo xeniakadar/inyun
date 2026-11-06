@@ -42,6 +42,30 @@ export function Icon({ name, size = 20, stroke = 1.600 }) {
   )
 }
 
+// The Inyeon mark, from the designer's exported SVG (inyeon-logo-ink.svg): thread and pin both in ink, as shipped.
+// LOGO_CENTRE is the thread's centreline, used only to reveal the outline progressively in the opening animation.
+export const LOGO_OUTLINE = 'M61.64 257.80 C52.21 306.77 42.78 355.73 32.65 404.57 C22.54 453.32 11.52 502.30 4.94 551.67 C-1.24 598.03 -4.13 649.34 11.56 694.14 C27.82 740.58 65.48 782.06 117.90 782.06 C174.89 782.06 224.90 732.80 255.88 689.58 C295.95 633.69 325.22 564.30 357.53 503.27 C380.25 460.35 414.66 400.65 452.83 369.92 C470.52 355.69 499.71 340.60 522.64 351.02 C544.50 360.95 555.21 392.17 558.72 413.96 C564.97 452.80 557.91 501.04 552.92 540.04 C547.19 584.75 541.30 630.95 547.10 675.94 C552.99 721.59 571.91 772.36 615.37 794.50 C657.30 815.87 706.80 804.72 750.66 796.33 C770.19 792.59 782.99 773.73 779.26 754.21 C775.52 734.68 756.66 721.88 737.13 725.61 C713.87 730.06 668.61 740.82 648.06 730.35 C629.20 720.74 620.95 685.61 618.51 666.73 C613.65 629.07 619.53 586.71 624.33 549.18 C630.41 501.74 637.45 450.02 629.80 402.53 C622.18 355.11 598.14 306.25 552.43 285.47 C502.93 262.97 447.95 281.43 407.69 313.84 C360.37 351.92 322.07 416.38 293.90 469.58 C263.61 526.79 234.68 595.58 197.37 647.63 C182.46 668.43 146.54 710.06 117.90 710.06 C98.80 710.06 84.94 685.83 79.51 670.34 C68.16 637.93 71.84 594.67 76.31 561.18 C82.65 513.62 93.40 466.17 103.15 419.19 C113.35 370.02 122.84 320.73 132.34 271.42 C136.10 251.89 123.32 233.02 103.80 229.26 C84.27 225.50 65.40 238.28 61.64 257.80 Z'
+export const LOGO_CENTRE = 'M97 264 C95 272 90 295 87 311 C84 327 81 342 78 358 C75 374 72 389 69 405 C66 421 62 436 59 452 C56 468 52 483 49 499 C46 515 44 530 42 546 C40 562 38 577 37 593 C36 609 36 624 38 640 C40 656 41 672 48 687 C55 702 68 724 81 733 C94 742 112 743 128 741 C144 739 160 733 175 722 C190 711 206 692 219 677 C232 662 240 646 250 630 C260 614 268 599 276 583 C284 567 292 552 300 536 C308 520 316 505 324 489 C332 473 340 458 350 442 C360 426 369 410 381 395 C393 380 406 362 421 349 C436 336 452 326 468 320 C484 314 499 311 515 314 C531 317 550 324 562 336 C574 348 581 367 586 383 C591 399 593 414 594 430 C595 446 595 461 594 477 C593 493 592 508 590 524 C588 540 586 555 585 571 C584 587 582 602 582 618 C582 634 581 649 583 665 C585 681 586 697 593 712 C600 727 611 748 624 757 C637 766 655 767 671 768 C687 769 707 765 718 764 C729 763 735 762 738 761'
+export const LOGO_VIEWBOX = '0 0 780 807'
+let logoN = 0
+export function Logo({ size = 40, color = '#1F2128', pin, animate = false, className = '' }) {
+  const id = useState(() => `logo-${logoN++}`)[0]
+  return (
+    <svg className={`logo-mark ${animate ? 'draw' : ''} ${className}`} width={size} height={size * 807 / 780} viewBox={LOGO_VIEWBOX} role="img" aria-label="Inyeon">
+      <defs>
+        <radialGradient id={`${id}-coral`} gradientUnits="userSpaceOnUse" cx="116.54" cy="56" r="144"><stop stopColor="#F3B0A2" /><stop offset="1" stopColor="#E07F78" /></radialGradient>
+        {animate && (
+          <mask id={`${id}-reveal`} maskUnits="userSpaceOnUse" x="0" y="0" width="780" height="807">
+            <path className="reveal" d={LOGO_CENTRE} fill="none" stroke="#fff" strokeWidth="110" strokeLinecap="round" strokeLinejoin="round" pathLength="1" />
+          </mask>
+        )}
+      </defs>
+      <path d={LOGO_OUTLINE} fill={color} mask={animate ? `url(#${id}-reveal)` : undefined} />
+      <circle cx="132.54" cy="80" r="80" fill={pin || color} />
+    </svg>
+  )
+}
+
 export function StatusBar({ light }) {
   return (
     <div className={`statusbar ${light ? 'light' : ''}`} aria-hidden="true">
