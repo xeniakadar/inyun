@@ -217,7 +217,7 @@ img { display: block; }
 .pin-ticket { width: 112px; background: #fff; border-left: 12px solid var(--blue); padding: 7px 8px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); display: grid; font-size: 6px; letter-spacing: 0.06em; gap: 1px; }
 .pin-ticket b { font-size: 12px; letter-spacing: 0; }
 .pin-ticket .blue { color: var(--blue); }
-.pin-receipt { width: 92px; background: #fff; padding: 8px 7px 12px; display: grid; gap: 2px; font-size: 5.500px; letter-spacing: 0.04em; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); clip-path: polygon(0 0, 100% 0, 100% 96%, 92% 100%, 84% 96%, 76% 100%, 68% 96%, 60% 100%, 52% 96%, 44% 100%, 36% 96%, 28% 100%, 20% 96%, 12% 100%, 4% 96%, 0 100%); }
+.pin-receipt { width: 96px; background: #fffef6; padding: 9px 8px 22px; display: grid; gap: 2px; font-size: 5.500px; letter-spacing: 0.04em; text-transform: uppercase; word-break: break-word; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); clip-path: polygon(0 0, 100% 0, 100% 96%, 92% 100%, 84% 96%, 76% 100%, 68% 96%, 60% 100%, 52% 96%, 44% 100%, 36% 96%, 28% 100%, 20% 96%, 12% 100%, 4% 96%, 0 100%); }
 .pin-receipt hr { border: 0; border-top: 1px dashed #999; width: 100%; margin: 2px 0; }
 .pin-strip { width: 46px; background: #fff; padding: 4px; display: grid; gap: 4px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18); }
 .pin-strip span { height: 42px; display: block; overflow: hidden; filter: grayscale(1); }
@@ -225,7 +225,7 @@ img { display: block; }
 .pin-license { width: 136px; background: #fff; padding: 9px 8px; display: flex; gap: 8px; align-items: center; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); border-top: 3px dotted var(--ink); border-bottom: 3px dotted var(--ink); }
 .lic-photo { width: 38px; height: 46px; flex: none; overflow: hidden; filter: grayscale(1); }
 .lic-text { font-size: 5.500px; letter-spacing: 0.05em; line-height: 1.6; }
-.pin-sticker { font-size: 32px; line-height: 1; filter: drop-shadow(0 0 0 #fff) drop-shadow(1.500px 0 0 #fff) drop-shadow(-1.500px 0 0 #fff) drop-shadow(0 1.500px 0 #fff) drop-shadow(0 -1.500px 0 #fff) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25)); }
+.pin-sticker { font-size: 32px; line-height: 1; display: grid; filter: drop-shadow(0 0 0 #fff) drop-shadow(1.500px 0 0 #fff) drop-shadow(-1.500px 0 0 #fff) drop-shadow(0 1.500px 0 #fff) drop-shadow(0 -1.500px 0 #fff) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25)); }
 .pin-chip { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 12px; border-radius: 15px; border: 1.200px solid var(--ink); background: #fff; font-size: 12px; font-weight: 500; white-space: nowrap; }
 .pin-chip.place { color: var(--blue); border-color: #c9c9c9; border-radius: 8px; font-size: 9px; letter-spacing: 0.1em; }
 .pin-chip.time { border-radius: 8px; border-width: 1.600px; font-size: 14px; }
@@ -313,3 +313,18 @@ img { display: block; }
 .summary .pill { margin-right: 8px; height: 38px; }
 .toast { position: absolute; left: 50%; bottom: 110px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 22px; font-size: 13px; font-weight: 500; white-space: nowrap; z-index: 30; animation: pop 0.3s ease; }
 .toast.hint { bottom: 148px; }
+
+/* list (receipt) */
+.pin-receipt .total { display: flex; gap: 10px; }
+.pin-receipt i { font-style: normal; }
+.pin-countdown { background: #4f6b58; color: #fff; border-radius: 12px; padding: 8px 14px 6px; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18); }
+.pin-countdown span { display: block; font-size: 6.500px; letter-spacing: 0.14em; }
+.pin-countdown b { font-size: 22px; line-height: 1.1; }
+.listwrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 10px 20px 0; min-height: 0; }
+.receipt-edit { width: 270px; background: #fffef6; padding: 26px 22px 52px; display: grid; gap: 4px; box-shadow: 0 6px 16px rgba(60, 50, 10, 0.16); clip-path: polygon(0 0, 100% 0, 100% 97%, 95% 100%, 90% 97%, 85% 100%, 80% 97%, 75% 100%, 70% 97%, 65% 100%, 60% 97%, 55% 100%, 50% 97%, 45% 100%, 40% 97%, 35% 100%, 30% 97%, 25% 100%, 20% 97%, 15% 100%, 10% 97%, 5% 100%, 0 97%); }
+.receipt-edit input, .receipt-edit textarea { border: 0; background: none; outline: none; padding: 2px 0; width: 100%; font-size: 16px; line-height: 1.45; text-transform: uppercase; letter-spacing: 0.02em; resize: none; border-radius: 2px; }
+.receipt-edit input:focus-visible, .receipt-edit textarea:focus-visible { outline: 0; background: rgba(63, 102, 214, 0.08); }
+.receipt-edit ::placeholder { color: #b9b7a8; }
+.receipt-edit hr { border: 0; border-top: 1.500px dashed #55554f; width: 72%; margin: 4px 0; justify-self: start; }
+.receipt-edit label { display: flex; gap: 22px; align-items: center; font-size: 16px; }
+.pill.edit { align-self: flex-start; margin-top: 8px; }

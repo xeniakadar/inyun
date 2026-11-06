@@ -17,8 +17,15 @@ export const FRIENDS = [
 ]
 export const friend = (id) => FRIENDS.find((f) => f.id === id)
 
+// What a list pin shows until someone writes their own.
+export const LIST_DEFAULT = {
+  title: 'To try when I visit',
+  items: ['Pizza, that one', 'Danube, night', 'Your good cafe', 'Flowers (again)'],
+  total: '1 visit',
+  footer: 'Soon, please',
+}
+
 export const NOTE_COLORS = ['#fdf8c9', '#f6d9c4', '#d9ead9', '#d6e3fb', '#e2d9f7']
-export const STICKERS = ['❤️', '😂', '😏', '🔥', '👀', '❞', '✈️', '💬', '✳️', '➡️', '🌙', '🍕']
 
 let n = 0
 export const uid = () => `${Date.now().toString(36)}${(n++).toString(36)}`
@@ -39,17 +46,17 @@ const novemberPins = () => [
   { id: 'p10', type: 'poll', q: 'miss me?', options: ['yes', 'also yes'], x: 452, y: 40, rot: 3, day: 26, by: 'alex' },
   { id: 'p11', type: 'receipt', x: 470, y: 130, rot: 1, day: 28, by: 'me' },
   { id: 'p12', type: 'place', label: 'BUDAPEST', x: 596, y: 130, rot: -2, day: 30, by: 'alex' },
-  { id: 'p13', type: 'sticker', emoji: '❤️', x: 610, y: 180, rot: 8, day: 30, by: 'me' },
+  { id: 'p13', type: 'sticker', name: 'heart', x: 610, y: 180, rot: 8, day: 30, by: 'me' },
   { id: 'p15', type: 'photo', art: 'nyc', x: 596, y: 4, rot: -2, day: 29, by: 'me',
     comments: [{ by: 'me', text: 'the sky did this tonight. wish you saw it', meta: 'NEW YORK · 5:02 PM' }] },
-  { id: 'p14', type: 'sticker', emoji: '✳️', x: 650, y: 240, rot: 0, day: 30, by: 'alex' },
+  { id: 'p14', type: 'sticker', name: 'asterisk', x: 650, y: 240, rot: 0, day: 30, by: 'alex' },
 ]
 
 const octoberPins = () => [
   { id: 'o1', type: 'note', text: 'landed. it is so cold here', color: NOTE_COLORS[3], x: 20, y: 60, rot: -2, day: 2, by: 'alex' },
   { id: 'o2', type: 'photo', art: 'nyc', x: 150, y: 50, rot: 3, day: 6, by: 'me' },
   { id: 'o3', type: 'voice', dur: 21, x: 40, y: 190, rot: -2, day: 11, by: 'me' },
-  { id: 'o4', type: 'sticker', emoji: '🌙', x: 250, y: 200, rot: 0, day: 15, by: 'alex' },
+  { id: 'o4', type: 'sticker', name: 'moon', x: 250, y: 200, rot: 0, day: 15, by: 'alex' },
   { id: 'o5', type: 'note', text: 'first week at the new job. did not cry', color: NOTE_COLORS[4], x: 260, y: 60, rot: 2, day: 21, by: 'me' },
   { id: 'o6', type: 'photo', art: 'budapest', x: 160, y: 190, rot: -3, day: 27, by: 'alex' },
 ]
@@ -66,7 +73,7 @@ export function seed() {
         pins: [
           { id: 's1', type: 'photo', art: 'nyc', x: 150, y: 30, rot: 3, day: 5, by: 'me' },
           { id: 's2', type: 'note', text: 'first week at the new job. did not cry', color: NOTE_COLORS[4], x: 26, y: 150, rot: -2, day: 5, by: 'me' },
-          { id: 's3', type: 'sticker', emoji: '✳️', x: 150, y: 190, rot: 0, day: 5, by: 'me' },
+          { id: 's3', type: 'sticker', name: 'asterisk', x: 150, y: 190, rot: 0, day: 5, by: 'me' },
           { id: 's4', type: 'license', x: 96, y: 262, rot: 2, day: 5, by: 'me' },
         ],
       },
@@ -105,6 +112,7 @@ function reducer(state, a) {
     case 'addBoard': return { ...state, boards: [...state.boards, a.board] }
     case 'addPin': return { ...mapBoard(state, a.boardId, (b) => ({ ...b, pins: [...b.pins, a.pin] })), dragHint: state.dragHint || 'show' }
     case 'movePin': return mapPin(state, a.boardId, a.pinId, (p) => ({ ...p, x: a.x, y: a.y }))
+    case 'updatePin': return mapPin(state, a.boardId, a.pinId, (p) => ({ ...p, ...a.patch }))
     case 'removePin': return mapBoard(state, a.boardId, (b) => ({ ...b, pins: b.pins.filter((p) => p.id !== a.pinId) }))
     case 'comment': return mapPin(state, a.boardId, a.pinId, (p) => ({ ...p, comments: [...(p.comments || []), a.comment] }))
     case 'vote': return mapPin(state, a.boardId, a.pinId, (p) => ({ ...p, vote: a.option }))

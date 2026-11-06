@@ -1,6 +1,7 @@
 // Shared building blocks: icons, avatars, placeholder art, and every kind of pin.
 import { useEffect, useRef, useState } from 'react'
-import { friend } from './store.js'
+import { LIST_DEFAULT, friend } from './store.js'
+import { Sticker } from './stickers.jsx'
 
 const paths = {
   back: <path d="M19 12H5m6-6-6 6 6 6" />,
@@ -17,6 +18,7 @@ const paths = {
   check: <path d="m5 12.500 4.500 4.500L19 7.500" />,
   music: <><path d="M9 18V6l10-2v12" /><circle cx="6.500" cy="18" r="2.500" /><circle cx="16.500" cy="16" r="2.500" /></>,
   link: <path d="M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1M14 10a4 4 0 0 0-5.700 0l-3 3a4 4 0 0 0 5.700 5.700l1-1" />,
+  list: <path d="M9 7h11M9 12h11M9 17h11M4.500 7h.01M4.500 12h.01M4.500 17h.01" />,
   place: <><path d="M12 21s7-6.200 7-11.500a7 7 0 0 0-14 0C5 14.800 12 21 12 21z" /><circle cx="12" cy="9.500" r="2.300" /></>,
   settings: <><circle cx="12" cy="12" r="3" /><path d="M19.400 13.500a7.600 7.600 0 0 0 0-3l2-1.500-2-3.500-2.400 1a7.600 7.600 0 0 0-2.600-1.500L14 2.500h-4l-.4 2.500A7.600 7.600 0 0 0 7 6.500l-2.400-1-2 3.500 2 1.500a7.600 7.600 0 0 0 0 3l-2 1.500 2 3.500 2.400-1a7.600 7.600 0 0 0 2.600 1.500l.4 2.500h4l.4-2.500a7.600 7.600 0 0 0 2.600-1.500l2.400 1 2-3.500z" /></>,
 }
@@ -180,6 +182,9 @@ function Voice({ pin }) {
   )
 }
 
+// "pizza" becomes "1x pizza"; a line that already starts with a count ("2x tickets") is left alone.
+export const listLine = (item) => (/^\d+\s*x\b/i.test(item.trim()) ? item.trim() : `1x ${item.trim()}`)
+
 const Tack = () => <span className="tack" aria-hidden="true" />
 
 export function PinView({ pin, user, onVote }) {
@@ -209,9 +214,10 @@ export function PinView({ pin, user, onVote }) {
     case 'receipt':
       return (
         <div className="pin-receipt">
-          <span>TO TRY WHEN I VISIT</span><hr />
-          <span>1x PIZZA, THAT ONE</span><span>1x DANUBE, NIGHT</span><span>1x YOUR GOOD CAFE</span><span>1x FLOWERS (AGAIN)</span><hr />
-          <span>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;1 VISIT</span><span>SOON, PLEASE</span>
+          <span>{pin.title ?? LIST_DEFAULT.title}</span><hr />
+          {(pin.items ?? LIST_DEFAULT.items).map((item, i) => <span key={i}>{listLine(item)}</span>)}<hr />
+          <span className="total"><i>TOTAL</i>{pin.total ?? LIST_DEFAULT.total}</span>
+          <span>{pin.footer ?? LIST_DEFAULT.footer}</span>
         </div>
       )
     case 'strip':
@@ -228,7 +234,9 @@ export function PinView({ pin, user, onVote }) {
         </div>
       )
     case 'sticker':
-      return <div className="pin-sticker">{pin.emoji}</div>
+      return <div className="pin-sticker"><Sticker name={pin.name} emoji={pin.emoji} /></div>
+    case 'countdown':
+      return <div className="pin-countdown"><span>{pin.label}</span><b>{pin.n}</b></div>
     case 'place':
       return <div className="pin-chip place"><Icon name="place" size={12} />{pin.label}</div>
     case 'time':

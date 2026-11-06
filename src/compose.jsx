@@ -1,6 +1,7 @@
 // The four things you can pin: note, voice, photo, sticker.
 import { useEffect, useRef, useState } from 'react'
-import { NOTE_COLORS, STICKERS, TODAY, fileToDataUrl, timeIn, uid } from './store.js'
+import { LIST_DEFAULT, NOTE_COLORS, TODAY, fileToDataUrl, timeIn, uid } from './store.js'
+import { STICKER_NAMES, Sticker } from './stickers.jsx'
 import { Art, Icon, PinView, StatusBar, Wave, clock } from './ui.jsx'
 
 const drop = (extra) => ({
@@ -129,7 +130,7 @@ export function PhotoPicker({ dispatch, id, back }) {
   )
 }
 
-export function StickerPicker({ dispatch, id, back }) {
+export function StickerPicker({ dispatch, id, back, go }) {
   const [sel, setSel] = useState({ type: 'poll', q: 'miss me?', options: ['yes', 'also yes'] })
   const ask = (label, fallback) => (window.prompt(label, fallback) || '').trim()
   const extras = [
@@ -137,6 +138,7 @@ export function StickerPicker({ dispatch, id, back }) {
     { key: 'link', node: <><Icon name="link" size={13} /> add link</>, make: () => { const l = ask('Paste a link', 'inyun.app'); return l && { type: 'link', label: l } } },
     { key: 'time', node: <b>{timeIn('America/New_York')}</b>, cls: 'time', make: () => ({ type: 'time', label: timeIn('America/New_York') }) },
     { key: 'place', node: <><Icon name="place" size={13} /> NEW YORK</>, cls: 'place', make: () => ({ type: 'place', label: 'NEW YORK' }) },
+    { key: 'days', node: <>days until</>, make: () => { const n = parseInt(ask('How many days until you see them?', '43'), 10); return n >= 0 && { type: 'countdown', label: 'DAYS UNTIL YOU', n } } },
   ]
   return (
     <div className="screen paper">
@@ -149,12 +151,56 @@ export function StickerPicker({ dispatch, id, back }) {
           <button key={x.key} className={`pin-chip ${x.cls || ''}`} onClick={() => { const s = x.make(); if (s) setSel(s) }}>{x.node}</button>
         ))}
         <button className="pin-chip" onClick={() => setSel({ type: 'poll', q: 'miss me?', options: ['yes', 'also yes'] })}>miss me?</button>
+        <button className="pin-chip" onClick={() => go('list', { id }, true)}><Icon name="list" size={13} /> list</button>
       </div>
       <div className="stickergrid">
-        {STICKERS.map((s) => (
-          <button key={s} className={`pin-sticker ${sel.emoji === s ? 'on' : ''}`} onClick={() => setSel({ type: 'sticker', emoji: s })} aria-label={`Sticker ${s}`}>{s}</button>
+        {STICKER_NAMES.map((s) => (
+          <button key={s} className={`pin-sticker ${sel.name === s ? 'on' : ''}`} onClick={() => setSel({ type: 'sticker', name: s })} aria-label={`${s} sticker`}><Sticker name={s} size={44} /></button>
         ))}
       </div>
+    </div>
+  )
+}
+
+// A list is written straight onto the receipt, the same way a note is written onto the sticky.
+// Opened with a pinId it edits that list instead of making a new one.
+export function ListComposer({ state, dispatch, id, pinId, back }) {
+  const existing = pinId && state.boards.find((b) => b.id === id)?.pins.find((p) => p.id === pinId)
+  const [title, setTitle] = useState(existing ? existing.title ?? LIST_DEFAULT.title : '')
+  const [items, setItems] = useState(existing ? (existing.items ?? LIST_DEFAULT.items).join('\n') : '')
+  const [total, setTotal] = useState(existing ? existing.total ?? LIST_DEFAULT.total : '')
+  const [footer, setFooter] = useState(existing ? existing.footer ?? LIST_DEFAULT.footer : '')
+  const lines = items.split('\n').map((l) => l.trim()).filter(Boolean)
+  const save = () => {
+    const data = {
+      title: title.trim() || LIST_DEFAULT.title,
+      items: lines,
+      total: total.trim() || `${lines.length} ${lines.length === 1 ? 'thing' : 'things'}`,
+      footer: footer.trim(),
+    }
+    if (existing) dispatch({ type: 'updatePin', boardId: id, pinId, patch: data })
+    else dispatch({ type: 'addPin', boardId: id, pin: drop({ type: 'receipt', ...data }) })
+    back()
+  }
+  return (
+    <div className="screen paper">
+      <StatusBar />
+      <Header back={back} title={existing ? 'Edit list' : 'Make a list'} />
+      <div className="listwrap scroll">
+        <div className="receipt-edit">
+          <input value={title} placeholder={LIST_DEFAULT.title} maxLength={28} aria-label="List title" autoFocus={!existing} onChange={(e) => setTitle(e.target.value)} />
+          <hr />
+          <textarea
+            value={items} rows={Math.max(4, items.split('\n').length)} aria-label="List items, one per line"
+            placeholder={LIST_DEFAULT.items.join('\n')} onChange={(e) => setItems(e.target.value)}
+          />
+          <hr />
+          <label><span>TOTAL</span><input value={total} placeholder={LIST_DEFAULT.total} maxLength={16} aria-label="Total" onChange={(e) => setTotal(e.target.value)} /></label>
+          <input value={footer} placeholder={LIST_DEFAULT.footer} maxLength={28} aria-label="Last line" onChange={(e) => setFooter(e.target.value)} />
+        </div>
+        <span className="caps">ONE THING PER LINE · "1x" IS ADDED FOR YOU</span>
+      </div>
+      <div className="recrow"><button className="btn dark" disabled={!lines.length} onClick={save}>{existing ? 'Save list' : 'Pin to board'}</button></div>
     </div>
   )
 }

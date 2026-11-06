@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useStore } from './store.js'
 import { AllSet, INTRO_COUNT, Intro, Invite, Purpose, Setup, Splash } from './onboarding.jsx'
 import { Board, Home, NewBoard, PinDetail, Settings } from './board.jsx'
-import { NoteComposer, PhotoPicker, StickerPicker } from './compose.jsx'
+import { ListComposer, NoteComposer, PhotoPicker, StickerPicker } from './compose.jsx'
 import { RecapPlayer, Recaps } from './recap.jsx'
 
 // A tiny screen stack instead of a router: go() pushes a screen, back() pops it.
@@ -46,6 +46,7 @@ export default function App() {
     case 'voice': screen = <NoteComposer {...p} id={route.id} voiceFirst />; break
     case 'photo': screen = <PhotoPicker {...p} id={route.id} />; break
     case 'sticker': screen = <StickerPicker {...p} id={route.id} />; break
+    case 'list': screen = <ListComposer {...p} id={route.id} pinId={route.pinId} />; break
     case 'recaps': screen = <Recaps {...p} id={route.id} />; break
     case 'recap': screen = <RecapPlayer {...p} id={route.id} month={route.month} />; break
     case 'settings': screen = <Settings {...p} />; break

@@ -196,7 +196,7 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
   )
 }
 
-export function PinDetail({ state, dispatch, id, pinId, back }) {
+export function PinDetail({ state, dispatch, id, pinId, go, back }) {
   const [text, setText] = useState('')
   const board = state.boards.find((b) => b.id === id)
   const pin = board?.pins.find((p) => p.id === pinId)
@@ -229,6 +229,9 @@ export function PinDetail({ state, dispatch, id, pinId, back }) {
           <input className="writeback serif" value={text} placeholder="Write back..." onChange={(e) => setText(e.target.value)} />
         </form>
         <hr /><hr />
+        {pin.by === 'me' && pin.type === 'receipt' && (
+          <button className="pill float edit" onClick={() => go('list', { id, pinId })}>Edit list</button>
+        )}
         {pin.by === 'me' && (
           <button className="plain tiny danger" onClick={() => { dispatch({ type: 'removePin', boardId: id, pinId }); back() }}>Take this off the board</button>
         )}
