@@ -4,14 +4,14 @@ import { MONTH, NEXT_MONTH, TODAY, boardTitle, fileToDataUrl, friend, hasNews, t
 import { Art, Avatar, DateSticker, Icon, Logo, PinView, StatusBar } from './ui.jsx'
 
 // Home · Friends · + · Activity · Settings.
-export function BottomNav({ state, go, onPlus, open, current, plusLabel = 'Pin something' }) {
+export function BottomNav({ state, go, onPlus, open, closing, current, plusLabel = 'Pin something' }) {
   const tab = (name, icon, label, extra) => (
     <button className={`tab t-${name}`} onClick={() => go(name)} aria-current={current === name ? 'page' : undefined}>
       <span className="tabicon"><Icon name={icon} size={19} />{extra}</span><span>{label}</span>
     </button>
   )
   return (
-    <nav className={`bottomnav ${open ? 'open' : ''}`}>
+    <nav className={`bottomnav ${open || closing ? 'open' : ''}`}>
       {tab('home', 'home', 'HOME')}
       {tab('friends', 'friends', 'FRIENDS')}
       <button className="fab" onClick={onPlus} aria-label={open ? 'Close' : plusLabel}><Icon name={open ? 'x' : 'plus'} size={20} /></button>
@@ -150,6 +150,22 @@ function DraggablePin({ pin, user, onMove, onOpen, onVote }) {
   )
 }
 
+// Measures where each menu option ends up relative to the + button and stores the offset on it,
+// so the open animation can start every option exactly on the button and let it fly out from there.
+function placeBurst(el) {
+  if (!el) return
+  const fab = el.parentElement.querySelector('.bottomnav .fab')?.getBoundingClientRect()
+  if (!fab) return
+  el.querySelectorAll('.menuitem').forEach((item) => {
+    const icon = item.querySelector('.fab').getBoundingClientRect()
+    item.style.setProperty('--fx', `${fab.left + fab.width / 2 - (icon.left + icon.width / 2)}px`)
+    item.style.setProperty('--fy', `${fab.top + fab.height / 2 - (icon.top + icon.height / 2)}px`)
+    item.classList.add('go')
+  })
+}
+
+const PAGE = 330 // one swipe moves this far; the canvas is 366 wide, so the next page always peeks in
+
 const MENU = [
   { key: 'photo', icon: 'image', label: 'PHOTO' },
   { key: 'voice', icon: 'mic', label: 'VOICE' },
@@ -158,7 +174,13 @@ const MENU = [
 ]
 
 export function Board({ state, dispatch, id, go, back, newMonth }) {
-  const [menu, setMenu] = useState(false)
+  const [menu, setMenu] = useState(false) // false | 'open' | 'closing'
+  const openMenu = () => setMenu('open')
+  const closeMenu = () => { setMenu('closing'); setTimeout(() => setMenu((m) => (m === 'closing' ? false : m)), 260) }
+  const canvas = useRef(null)
+  const [more, setMore] = useState(true) // is there board to the right of what is showing?
+  const checkMore = () => { const c = canvas.current; if (c) setMore(c.scrollLeft + c.clientWidth < c.scrollWidth - 8) }
+  useEffect(checkMore, [id])
   const board = state.boards.find((b) => b.id === id)
   const { user } = state
   const pins = newMonth || !board ? [] : board.pins
@@ -178,8 +200,10 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
         <button className="plain" onClick={() => go('recaps', { id })} aria-label="Recaps"><Members board={board} user={user} /></button>
         <h1 className="serif spaced">{boardTitle(board, user)}</h1>
       </header>
-      <div className={`canvas ${menu ? 'blurred' : ''}`}>
+      <div className={`canvas ${menu ? 'blurred' : ''} ${more ? 'has-more' : ''}`} ref={canvas} onScroll={checkMore}>
         <div className="canvas-inner">
+          {/* snap points every page width, so a swipe lands with a sliver of the next page showing */}
+          {[0, 1, 2, 3].map((n) => <i key={n} className="snap" style={{ left: n * PAGE }} />)}
           <button className="plain datebtn" onClick={() => go('recaps', { id })} aria-label="Open recaps">
             <DateSticker month={newMonth ? NEXT_MONTH : MONTH} day={newMonth ? 1 : TODAY} />
           </button>
@@ -201,16 +225,16 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
       </div>
       {showHint && <button className="toast hint" onClick={hintDone}>Drag to move · tap to open</button>}
       {menu && (
-        <div className="addmenu" onClick={() => setMenu(false)}>
+        <div className={`addmenu ${menu === 'closing' ? 'closing' : ''}`} onClick={closeMenu} ref={placeBurst}>
           {MENU.map((m, i) => (
-            <button key={m.key} className={`menuitem m${i}`} onClick={() => go(m.key, { id })}>
+            <button key={m.key} className={`menuitem m${i}`} style={{ '--n': [1, 2, 0, 3][i] }} onClick={() => go(m.key, { id })}>
               <span className="fab"><Icon name={m.icon} size={18} /></span>
               <span className="caps">{m.label}</span>
             </button>
           ))}
         </div>
       )}
-      <BottomNav state={state} go={go} open={menu} onPlus={() => setMenu((m) => !m)} />
+      <BottomNav state={state} go={go} open={menu === 'open'} closing={menu === 'closing'} onPlus={() => (menu === 'open' ? closeMenu() : openMenu())} />
     </div>
   )
 }

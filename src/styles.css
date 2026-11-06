@@ -180,7 +180,7 @@ img { display: block; }
 .spaced { font-size: 18px; letter-spacing: 0.06em; font-weight: 400; }
 .board-head { display: flex; align-items: center; gap: 10px; padding: 4px 18px; height: 56px; flex: none; }
 .board-head h1 { flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.canvas { flex: 1; margin: 4px 12px 0; border-radius: 22px; overflow-x: auto; overflow-y: hidden; background-color: #f4f4f0; background-image: radial-gradient(#e2e2dc 1px, transparent 1px); background-size: 7px 7px; transition: filter 0.2s, opacity 0.2s; scrollbar-width: none; }
+.canvas { flex: 1; margin: 4px 12px 0; border-radius: 22px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-padding-left: 0; background-color: #f4f4f0; background-image: radial-gradient(#e2e2dc 1px, transparent 1px); background-size: 7px 7px; transition: filter 0.2s, opacity 0.2s; scrollbar-width: none; }
 .canvas::-webkit-scrollbar, .rail::-webkit-scrollbar { display: none; }
 .canvas-inner { position: relative; width: 1400px; height: 100%; min-height: 420px; }
 .blurred { filter: blur(7px); opacity: 0.55; pointer-events: none; }
@@ -207,7 +207,26 @@ img { display: block; }
 .bottomnav.open > button:not(.fab) { visibility: hidden; }
 .bottomnav.open .fab { pointer-events: auto; }
 .bottomnav > button[aria-current='page'] { font-weight: 700; }
-.addmenu { position: absolute; inset: 0; z-index: 10; animation: fade 0.2s; }
+.addmenu { position: absolute; inset: 0; z-index: 10; }
+/* the four options burst out of the + button: each starts tiny on the button itself, then flies to its spot and settles
+   with a small overshoot (copied from the Figma prototype). --fx/--fy are measured at open time, see placeBurst(). */
+.menuitem { opacity: 0; }
+.menuitem.go { animation: burst 0.42s cubic-bezier(0.22, 1.35, 0.36, 1) both; animation-delay: calc(var(--n, 0) * 28ms); }
+@keyframes burst {
+  from { opacity: 0; transform: translateX(-50%) translate(var(--fx, 0px), var(--fy, 0px)) scale(0.15); }
+  25% { opacity: 1; }
+  to { opacity: 1; transform: translateX(-50%); }
+}
+.blurred { transition-duration: 0.1s; }
+/* closing: the same flight in reverse, all four at once, back into the + button */
+.addmenu.closing .menuitem.go { animation: burst-back 0.24s cubic-bezier(0.5, 0, 0.75, 0.2) both; animation-delay: 0ms; pointer-events: none; }
+/* a separate name so the browser starts a fresh animation instead of jumping to the end of the reversed one */
+@keyframes burst-back {
+  from { opacity: 1; transform: translateX(-50%); }
+  75% { opacity: 1; }
+  to { opacity: 0; transform: translateX(-50%) translate(var(--fx, 0px), var(--fy, 0px)) scale(0.15); }
+}
+.bottomnav.open > button:not(.fab) { visibility: hidden; }
 .menuitem { position: absolute; display: grid; justify-items: center; gap: 8px; transform: translateX(-50%); }
 .m0 { left: 32%; bottom: 114px; }
 .m1 { left: 68%; bottom: 114px; }
@@ -310,8 +329,11 @@ img { display: block; }
 .monthname { font-size: 50px; line-height: 1.15; display: block; }
 .recap { flex: 1; display: flex; flex-direction: column; transition: opacity 0.4s; min-height: 0; }
 .recap.dim { opacity: 0.35; pointer-events: none; }
-.recap-pins { flex: 1; min-height: 0; padding: 8px 14px 0; display: flex; flex-wrap: wrap; gap: 12px 14px; align-content: flex-start; align-items: flex-start; zoom: 0.72; overflow: hidden; }
-.recap-pins .datesticker { transform: rotate(-3deg) scale(1.25); margin: 8px 10px 8px 6px; }
+.recap-pins { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+.recap-collage { position: relative; width: 390px; }
+.recap-date { position: absolute; left: 10px; top: 6px; z-index: 5; }
+.recap-pin { position: absolute; }
+.recap-date .datesticker { transform: rotate(-3deg) scale(1.25); }
 .recap-pin { animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1); }
 @keyframes pop { from { opacity: 0; scale: 0.5; } to { opacity: 1; scale: 1; } }
 .walk { height: 170px; position: relative; flex: none; }
@@ -449,3 +471,8 @@ img { display: block; }
 .grad-live .logo { animation-delay: 1.9s; }
 .grad-live .splash-mid p { animation-delay: 2.15s; }
 .grad-live .foot { animation-delay: 2.4s; }
+
+/* board pages */
+.canvas .snap { position: absolute; top: 0; width: 1px; height: 1px; scroll-snap-align: start; pointer-events: none; }
+.canvas::after { content: ''; position: sticky; left: calc(100% - 44px); top: 0; display: block; width: 44px; height: 100%; margin-top: -100%; background: linear-gradient(to right, rgba(244, 244, 240, 0), rgba(244, 244, 240, 0.85)); opacity: 0; transition: opacity 0.25s; pointer-events: none; }
+.canvas.has-more::after { opacity: 1; }

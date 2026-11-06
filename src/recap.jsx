@@ -95,12 +95,48 @@ export function spreadOverMonth(pins) {
 
 // About a second per pin, so a full month does not rush past and a quiet one does not drag.
 const durationFor = (count) => Math.min(26000, Math.max(14000, count * 1000))
-const zoomFor = (count) => (count <= 12 ? 0.8 : count <= 18 ? 0.72 : count <= 26 ? 0.6 : 0.5)
+// Collage layout for the recap: loose columns, each pin nudged and tilted a little, overlapping like the board.
+// The collage is laid out wider when there are more pins, then scaled down so the whole month fits above the walk.
+// Deterministic (based on the pin's position in the month) so a recap looks the same every time it plays.
+const ROW = 108
+function collage(pins, areaH) {
+  const n = pins.length
+  // try 3..8 columns; take the one that lets the collage be drawn largest while each column stays wide enough for a pin
+  let best = { cols: 3, zoom: 0.42, width: 929 }
+  for (let cols = 3; cols <= 8; cols++) {
+    const rows = Math.ceil(n / cols)
+    const zoom = Math.max(0.42, Math.min(0.85, areaH / (rows * ROW + 180)))
+    const width = Math.round(390 / zoom)
+    if (width / cols >= 100 && zoom >= best.zoom) best = { cols, zoom, width }
+  }
+  const { cols, zoom, width } = best
+  const colW = (width - 130) / Math.max(1, cols - 1)
+  const laid = pins.map((p, k) => {
+    const j = ((k * 7919) % 97) / 97 - 0.5 // a stable "random" in -0.5..0.5
+    const row = Math.floor(k / cols), col = (k + (row % 2)) % cols
+    return { ...p, cx: Math.min(width - 125, Math.max(4, 16 + col * colW + j * 40)), cy: 66 + row * ROW + j * 36, crot: p.rot + j * 10 }
+  })
+  return { laid, zoom, width }
+}
+
+// About a second per pin, so a full month does not rush past and a quiet one does not drag.
 
 export function RecapPlayer({ state, id, month, back }) {
   const board = state.boards.find((b) => b.id === id)
   const { user } = state
-  const pins = spreadOverMonth(month === MONTH ? board.pins : board.archive?.[month] || [])
+  const month_pins = spreadOverMonth(month === MONTH ? board.pins : board.archive?.[month] || [])
+  const area = useRef(null)
+  const [areaH, setAreaH] = useState(420)
+  useEffect(() => {
+    const el = area.current
+    if (!el) return
+    const m = () => setAreaH(el.clientHeight)
+    m()
+    const ro = new ResizeObserver(m)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const { laid: pins, zoom, width } = collage(month_pins, areaH)
   const duration = durationFor(pins.length)
   const [t, setT] = useState(0)
   const [playing, setPlaying] = useState(true)
@@ -142,11 +178,13 @@ export function RecapPlayer({ state, id, month, back }) {
         <h1 className="serif spaced">{boardTitle(board, user)}</h1>
       </header>
       <div className={`recap ${done ? 'dim' : ''}`}>
-        <div className="recap-pins" style={{ zoom: zoomFor(pins.length) }}>
-          <DateSticker month={month} day={day} tint />
-          {shown.map((p) => (
-            <span key={p.id} className="recap-pin" style={{ transform: `rotate(${p.rot}deg)` }}><PinView pin={p} user={user} /></span>
-          ))}
+        <div className="recap-pins" ref={area}>
+          <div className="recap-collage" style={{ zoom, width }}>
+            <span className="recap-date"><DateSticker month={month} day={day} tint /></span>
+            {shown.map((p) => (
+              <span key={p.id} className="recap-pin" style={{ left: p.cx, top: p.cy, transform: `rotate(${p.crot}deg)` }}><PinView pin={p} user={user} /></span>
+            ))}
+          </div>
         </div>
         <div className={`walk ${playing ? 'go' : ''}`}>
           <div className="walkers" style={{ left: `${8 + t * 52}%` }}>

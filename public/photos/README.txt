@@ -5,7 +5,7 @@ Photos the app uses. Replace a file with another of the same name to swap it.
   budapest.jpg, budapest2.jpg, nyc.jpg
   friends.jpg, friends2.jpg, friends3.jpg
   drinks.jpg, sushi.jpg, flowers.jpg
-  fun.jpg, fun1.jpg, fun2.jpg, cat.jpg, dog.jpg
+  fun.jpg, fun1.jpg, fun2.jpg, cat.jpg, dog.jpg, field.jpg, tennis.jpg, friends4.jpg
 
 To add a new photo, save it here as a .jpg and use its name (without .jpg) as
 `art: 'name'` on a pin in src/store.js, or add it to GALLERY in src/compose.jsx.
