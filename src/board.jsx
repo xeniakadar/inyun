@@ -30,13 +30,24 @@ function Members({ board, user, size = 30 }) {
   )
 }
 
+// A board's card on Home. Each pin knows which way is "outward" from the middle of the card (--ox, --oy),
+// so on hover or press the collage can ease apart a few pixels while the card itself lifts.
 function Thumb({ board, user }) {
   return (
     <span className={`thumb hue-${board.hue}`}>
       <span className="thumb-inner">
-        {board.pins.slice(0, 6).map((p) => (
-          <span key={p.id} className="pin" style={{ left: p.x, top: p.y, transform: `rotate(${p.rot}deg)` }}><PinView pin={p} user={user} /></span>
-        ))}
+        {board.pins.slice(0, 6).map((p) => {
+          const dx = p.x + 55 - 180, dy = p.y + 55 - 180 // rough centre of the pin, relative to the card's centre
+          const len = Math.hypot(dx, dy) || 1
+          return (
+            <span
+              key={p.id} className="pin"
+              style={{ left: p.x, top: p.y, '--ox': (dx / len).toFixed(2), '--oy': (dy / len).toFixed(2), '--rot': `${p.rot}deg` }}
+            >
+              <PinView pin={p} user={user} />
+            </span>
+          )
+        })}
       </span>
     </span>
   )
@@ -54,13 +65,13 @@ export function Home({ state, go }) {
       </header>
       <div className="boards scroll">
         {boards.map((b, i) => (
-          <button key={b.id} className={`boardcard tilt${i % 3}`} onClick={() => go('board', { id: b.id })}>
+          <button key={b.id} className={`boardcard tilt${i % 3}`} style={{ '--i': i }} onClick={() => go('board', { id: b.id })}>
             <Thumb board={b} user={user} />
             {b.members.length > 1 && <Members board={b} user={user} size={16} />}
             <span className="scrawl-sm">{boardTitle(b, user)}</span>
           </button>
         ))}
-        <button className="boardcard" onClick={() => go('newboard')}>
+        <button className="boardcard" style={{ '--i': boards.length }} onClick={() => go('newboard')}>
           <span className="thumb new"><span className="fab"><Icon name="plus" size={18} /></span></span>
           <span className="scrawl-sm">New Board</span>
         </button>

@@ -138,7 +138,7 @@ export function StickerPicker({ dispatch, id, back, go }) {
   const ask = (label, fallback) => (window.prompt(label, fallback) || '').trim()
   const extras = [
     { key: 'song', node: <><Icon name="music" size={13} /> add song</>, make: () => { const l = ask('Which song?', 'our song'); return l && { type: 'song', label: l } } },
-    { key: 'link', node: <><Icon name="link" size={13} /> add link</>, make: () => { const l = ask('Paste a link', 'inyun.app'); return l && { type: 'link', label: l } } },
+    { key: 'link', node: <><Icon name="link" size={13} /> add link</>, make: () => { const l = ask('Paste a link', 'inyeon.app'); return l && { type: 'link', label: l } } },
     { key: 'time', node: <b>{timeIn('America/New_York')}</b>, cls: 'time', make: () => ({ type: 'time', label: timeIn('America/New_York') }) },
     { key: 'place', node: <><Icon name="place" size={13} /> NEW YORK</>, cls: 'place', make: () => ({ type: 'place', label: 'NEW YORK' }) },
     { key: 'days', node: <>days until</>, make: () => { const n = parseInt(ask('How many days until you see them?', '43'), 10); return n >= 0 && { type: 'countdown', label: 'DAYS UNTIL YOU', n } } },

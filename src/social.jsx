@@ -57,7 +57,7 @@ export function Friends({ state, dispatch, go }) {
           <input value={q} placeholder="Search by name or @username" aria-label="Search by name or username" autoCapitalize="none" autoCorrect="off" onChange={(e) => setQ(e.target.value)} />
         </label>
         {results ? (
-          results.length ? section('RESULTS', results) : <p className="muted empty">No one called "{q.trim()}" is on Inyun yet.</p>
+          results.length ? section('RESULTS', results) : <p className="muted empty">No one called "{q.trim()}" is on Inyeon yet.</p>
         ) : (
           <>
             {section('WANTS TO PIN WITH YOU', requests)}

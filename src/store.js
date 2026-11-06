@@ -17,7 +17,7 @@ export const FRIENDS = [
   { id: 'priya', name: 'Ella', username: 'ella', color: '#d9ccf5', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
   { id: 'sam', name: 'Sam', username: 'sam', color: '#f3cdb4', light: true, place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
 ]
-// People who are on Inyun but not on your boards yet. They show up in Find friends.
+// People who are on Inyeon but not on your boards yet. They show up in Find friends.
 export const OTHERS = [
   { id: 'mina', name: 'Xenia', username: 'xenia', color: '#b9a2ad', light: true, place: 'Seoul', tz: 'Asia/Seoul', offset: '14 hours ahead', km: 11000 },
   { id: 'theo', name: 'Ashley', username: 'ashley', color: '#4f6b58', place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },

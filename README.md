@@ -1,4 +1,4 @@
-# Inyun
+# Inyeon
 
 The long way counts. A shared board for the little things, built from the Corky Figma file for the UXC Designathon 2026.
 

@@ -51,7 +51,7 @@ export function Splash({ onStart, onHave }) {
       <Aurora palette="splash" />
       <StatusBar />
       <div className="splash-mid">
-        <h1 className="serif logo">Inyun</h1>
+        <h1 className="serif logo">Inyeon</h1>
         <p>For the little things,<br />and the people you share them with.</p>
       </div>
       <div className="foot">

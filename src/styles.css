@@ -159,16 +159,16 @@ img { display: block; }
 .scrawl-sm { font-family: var(--sans); font-size: 13px; font-weight: 500; text-align: center; max-width: 150px; }
 .boards { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 16px; padding: 24px 22px 40px; align-content: start; flex: 1; }
 .boardcard { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.tilt0 .thumb { transform: rotate(-3deg); }
-.tilt1 .thumb { transform: rotate(2deg); margin-top: 28px; }
-.tilt2 .thumb { transform: rotate(-1deg); }
+.tilt0 .thumb { --tilt: -3deg; }
+.tilt1 .thumb { --tilt: 2deg; margin-top: 28px; }
+.tilt2 .thumb { --tilt: -1deg; }
 .boardcard .members { margin: -22px 0 -2px; position: relative; z-index: 2; }
 .thumb { width: 152px; height: 152px; border-radius: 20px; overflow: hidden; position: relative; display: block; box-shadow: var(--shadow); }
 .thumb-inner { position: absolute; left: 0; top: 0; width: 360px; height: 360px; transform: scale(0.42); transform-origin: 0 0; pointer-events: none; }
 .hue-pink { background: linear-gradient(140deg, #f6dfe6, #efe3f6); }
 .hue-peach { background: linear-gradient(140deg, #fbeccf, #f9dcd0); }
 .hue-lilac { background: linear-gradient(140deg, #e7e0f8, #f7efcf); }
-.thumb.new { background: #fff; display: grid; place-items: center; transform: rotate(2deg); margin-top: 6px; }
+.thumb.new { background: #fff; display: grid; place-items: center; --tilt: 2deg; margin-top: 6px; }
 
 /* board */
 .bar { display: flex; align-items: center; gap: 12px; padding: 4px 18px; height: 56px; flex: none; }
@@ -414,3 +414,17 @@ img { display: block; }
 /* the same moving background on every onboarding screen: the still gradient is switched off and the blobs take over */
 .grad.live { background-image: none; }
 .grad > .aurora-fade { position: absolute; inset: 0; z-index: 0; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 110px, #fff 350px); }
+
+/* Home board cards: lift, straighten and open up slightly on hover (desktop) or press (touch).
+   --pop is the strength: 0 = off, 1 = as designed, 2 = closer to the original burst. */
+:root { --pop: 1; }
+.boardcard { animation: card-in 0.45s ease-out both; animation-delay: calc(var(--i, 0) * 70ms); }
+@keyframes card-in { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: none; } }
+.boardcard .thumb { transform: rotate(var(--tilt, 0deg)); transition: transform 0.18s ease-out, box-shadow 0.18s ease-out; }
+.thumb .pin { --spread: 0px; transform: translate(calc(var(--ox, 0) * var(--spread)), calc(var(--oy, 0) * var(--spread))) rotate(var(--rot, 0deg)); transition: transform 0.18s ease-out; }
+.boardcard:active .thumb { transform: translateY(calc(var(--pop) * -4px)) scale(calc(1 + var(--pop) * 0.03)) rotate(calc(var(--tilt, 0deg) * 0.25)); box-shadow: 0 14px 28px rgba(40, 36, 20, 0.16), 0 2px 5px rgba(40, 36, 20, 0.08); }
+.boardcard:active .thumb .pin { --spread: calc(var(--pop) * 11px); }
+@media (hover: hover) {
+  .boardcard:hover .thumb { transform: translateY(calc(var(--pop) * -4px)) scale(calc(1 + var(--pop) * 0.03)) rotate(calc(var(--tilt, 0deg) * 0.25)); box-shadow: 0 14px 28px rgba(40, 36, 20, 0.16), 0 2px 5px rgba(40, 36, 20, 0.08); }
+  .boardcard:hover .thumb .pin { --spread: calc(var(--pop) * 11px); }
+}
