@@ -1,0 +1,264 @@
+// Home, New board, the board itself (with the + menu), pin detail, and Settings.
+import { useRef, useState } from 'react'
+import { FRIENDS, MONTH, NEXT_MONTH, TODAY, boardTitle, fileToDataUrl, friend, timeIn, uid } from './store.js'
+import { Art, Avatar, DateSticker, Icon, PinView, StatusBar } from './ui.jsx'
+
+export function BottomNav({ go, onPlus, open }) {
+  return (
+    <nav className={`bottomnav ${open ? 'open' : ''}`}>
+      <button onClick={() => go('home')}><Icon name="home" size={18} /><span>HOME</span></button>
+      <button className="fab" onClick={onPlus} aria-label={open ? 'Close' : 'Pin something'}><Icon name={open ? 'x' : 'plus'} size={20} /></button>
+      <button onClick={() => go('settings')}><Icon name="settings" size={18} /><span>SETTINGS</span></button>
+    </nav>
+  )
+}
+
+function Members({ board, user, size = 30 }) {
+  return (
+    <span className="members">
+      <Avatar who="me" user={user} size={size} ring />
+      {board.members.map((m) => <Avatar key={m} who={m} size={size} ring />)}
+    </span>
+  )
+}
+
+function Thumb({ board, user }) {
+  return (
+    <span className={`thumb hue-${board.hue}`}>
+      <span className="thumb-inner">
+        {board.pins.slice(0, 6).map((p) => (
+          <span key={p.id} className="pin" style={{ left: p.x, top: p.y, transform: `rotate(${p.rot}deg)` }}><PinView pin={p} user={user} /></span>
+        ))}
+      </span>
+    </span>
+  )
+}
+
+export function Home({ state, go }) {
+  const { user, boards } = state
+  return (
+    <div className="screen paper">
+      <StatusBar />
+      <header className="home-head">
+        <span className="spacer" />
+        <h1 className="scrawl">Home</h1>
+        <button className="plain" onClick={() => go('settings')} aria-label="Settings"><Avatar who="me" user={user} size={34} /></button>
+      </header>
+      <div className="boards scroll">
+        {boards.map((b, i) => (
+          <button key={b.id} className={`boardcard tilt${i % 3}`} onClick={() => go('board', { id: b.id })}>
+            <Thumb board={b} user={user} />
+            {b.members.length > 1 && <Members board={b} user={user} size={16} />}
+            <span className="scrawl-sm">{boardTitle(b, user)}</span>
+          </button>
+        ))}
+        <button className="boardcard" onClick={() => go('newboard')}>
+          <span className="thumb new"><span className="fab"><Icon name="plus" size={18} /></span></span>
+          <span className="scrawl-sm">New Board</span>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export function NewBoard({ dispatch, go, back }) {
+  const [picked, setPicked] = useState(['alex'])
+  const toggle = (id) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+  const create = () => {
+    const id = uid()
+    dispatch({ type: 'addBoard', board: { id, members: picked, hue: ['peach', 'lilac', 'pink'][picked.length % 3], pins: [] } })
+    go('board', { id }, true)
+  }
+  return (
+    <div className="screen paper">
+      <StatusBar />
+      <header className="bar"><button className="round" onClick={back} aria-label="Back"><Icon name="back" size={18} /></button></header>
+      <h2 className="serif pad">Who's this board with?</h2>
+      <div className="people pad">
+        {FRIENDS.map((f) => {
+          const on = picked.includes(f.id)
+          return (
+            <button className={`person pick ${on ? 'on' : ''}`} key={f.id} aria-pressed={on} onClick={() => toggle(f.id)}>
+              <Avatar who={f.id} size={34} />
+              <b>{f.name}</b>
+              <span className="tick">{on && <Icon name="check" size={14} stroke={2} />}</span>
+            </button>
+          )
+        })}
+        <button className="person pick dashed" onClick={() => setPicked([])}>
+          <Icon name="plus" size={18} /><b>{picked.length ? 'Or keep it just for you' : 'Just for you'}</b>
+        </button>
+      </div>
+      <div className="grow" />
+      <div className="foot"><button className="btn dark" onClick={create}>Create board</button></div>
+    </div>
+  )
+}
+
+function DraggablePin({ pin, user, onMove, onOpen, onVote }) {
+  const [pos, setPos] = useState(null)
+  const start = useRef(null)
+  const down = (e) => {
+    start.current = { px: e.clientX, py: e.clientY, x: pin.x, y: pin.y, moved: false }
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+  const move = (e) => {
+    const s = start.current
+    if (!s) return
+    const dx = e.clientX - s.px, dy = e.clientY - s.py
+    if (!s.moved && Math.hypot(dx, dy) < 5) return
+    s.moved = true
+    setPos({ x: Math.max(-10, Math.min(640, s.x + dx)), y: Math.max(0, Math.min(400, s.y + dy)) })
+  }
+  const up = () => {
+    const s = start.current
+    start.current = null
+    if (!s) return
+    if (s.moved && pos) onMove(pos.x, pos.y)
+    else onOpen()
+    setPos(null)
+  }
+  const p = pos || pin
+  return (
+    <div
+      className={`pin ${pos ? 'dragging' : ''}`}
+      style={{ left: p.x, top: p.y, transform: `rotate(${pos ? 0 : pin.rot}deg)` }}
+      onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
+    >
+      <PinView pin={pin} user={user} onVote={onVote} />
+    </div>
+  )
+}
+
+const MENU = [
+  { key: 'photo', icon: 'image', label: 'PHOTO' },
+  { key: 'voice', icon: 'mic', label: 'VOICE' },
+  { key: 'note', icon: 'note', label: 'NOTE' },
+  { key: 'sticker', icon: 'star', label: 'STICKER' },
+]
+
+export function Board({ state, dispatch, id, go, back, newMonth }) {
+  const [menu, setMenu] = useState(false)
+  const board = state.boards.find((b) => b.id === id)
+  if (!board) return null
+  const { user } = state
+  const pins = newMonth ? [] : board.pins
+  return (
+    <div className="screen paper">
+      <StatusBar />
+      <header className="board-head">
+        <button className="plain" onClick={() => go('recaps', { id })} aria-label="Recaps"><Members board={board} user={user} /></button>
+        <h1 className="serif spaced">{boardTitle(board, user)}</h1>
+      </header>
+      <div className={`canvas ${menu ? 'blurred' : ''}`}>
+        <div className="canvas-inner">
+          <button className="plain datebtn" onClick={() => go('recaps', { id })} aria-label="Open recaps">
+            <DateSticker month={newMonth ? NEXT_MONTH : MONTH} day={newMonth ? 1 : TODAY} />
+          </button>
+          {pins.map((p) => (
+            <DraggablePin
+              key={p.id} pin={p} user={user}
+              onMove={(x, y) => dispatch({ type: 'movePin', boardId: id, pinId: p.id, x, y })}
+              onOpen={() => go('pin', { id, pinId: p.id })}
+              onVote={(option) => dispatch({ type: 'vote', boardId: id, pinId: p.id, option })}
+            />
+          ))}
+        </div>
+      </div>
+      <div className={`hintrow ${menu ? 'blurred' : ''}`}>
+        <span className="caps">{pins.length ? 'TAP TO ZOOM · SWIPE FOR MORE' : 'PRESS + TO PIN SOMETHING'}</span>
+        {newMonth
+          ? <button className="pill float" onClick={() => go('recaps', { id })}>Your {MONTH} recap <Icon name="arrow" size={12} stroke={2} /></button>
+          : pins.length > 0 && <button className="pill float" onClick={() => go('newmonth', { id })}>Skip to Dec 1 <Icon name="arrow" size={12} stroke={2} /></button>}
+      </div>
+      {menu && (
+        <div className="addmenu" onClick={() => setMenu(false)}>
+          {MENU.map((m, i) => (
+            <button key={m.key} className={`menuitem m${i}`} onClick={() => go(m.key, { id })}>
+              <span className="fab"><Icon name={m.icon} size={18} /></span>
+              <span className="caps">{m.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <BottomNav go={go} open={menu} onPlus={() => setMenu((m) => !m)} />
+    </div>
+  )
+}
+
+export function PinDetail({ state, dispatch, id, pinId, back }) {
+  const [text, setText] = useState('')
+  const board = state.boards.find((b) => b.id === id)
+  const pin = board?.pins.find((p) => p.id === pinId)
+  if (!pin) return null
+  const { user } = state
+  const send = (e) => {
+    e.preventDefault()
+    if (!text.trim()) return
+    const meta = `${(user.name || 'You').toUpperCase()} · NEW YORK · ${timeIn('America/New_York')}`
+    dispatch({ type: 'comment', boardId: id, pinId, comment: { by: 'me', text: text.trim(), meta } })
+    setText('')
+  }
+  const isPhoto = pin.type === 'photo'
+  return (
+    <div className="screen paper detail">
+      <StatusBar light={isPhoto} />
+      <div className={`detail-top ${isPhoto ? 'photo' : ''}`}>
+        {isPhoto ? <Art kind={pin.art} src={pin.src} /> : <div className="detail-pin"><PinView pin={pin} user={user} /></div>}
+        <button className="round overlay" onClick={back} aria-label="Back"><Icon name="back" size={18} /></button>
+      </div>
+      <div className="detail-notes scroll">
+        <span className="caps">NOTES</span>
+        {(pin.comments || []).map((c, i) => (
+          <div className="comment" key={i}>
+            <Avatar who={c.by} user={user} size={26} />
+            <div><p>{c.text}</p><span className="caps">{c.meta}</span></div>
+          </div>
+        ))}
+        <form onSubmit={send}>
+          <input className="writeback serif" value={text} placeholder="Write back..." onChange={(e) => setText(e.target.value)} />
+        </form>
+        <hr /><hr />
+        {pin.by === 'me' && (
+          <button className="plain tiny danger" onClick={() => { dispatch({ type: 'removePin', boardId: id, pinId }); back() }}>Take this off the board</button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export function Settings({ state, dispatch, go, back }) {
+  const file = useRef(null)
+  const { user } = state
+  const onBoards = [...new Set(state.boards.flatMap((b) => b.members))]
+  const pick = async (e) => {
+    const f = e.target.files?.[0]
+    if (f) dispatch({ type: 'user', patch: { photo: await fileToDataUrl(f, 500) } })
+  }
+  return (
+    <div className="screen paper">
+      <StatusBar />
+      <header className="bar"><button className="round" onClick={back} aria-label="Back"><Icon name="back" size={18} /></button></header>
+      <div className="pad scroll">
+        <h2 className="sans-title">Your face</h2>
+        <p className="muted">This photo is the head that walks across your recaps.</p>
+        <div className="face">
+          <Avatar who="me" user={user} size={96} />
+          <button className="pill float" onClick={() => file.current.click()}>Change photo</button>
+          <input ref={file} type="file" accept="image/*" hidden onChange={pick} />
+        </div>
+        <span className="caps">ON YOUR BOARDS</span>
+        {onBoards.map((m) => {
+          const f = friend(m)
+          return (
+            <div className="person flat" key={m}>
+              <Avatar who={m} size={30} />
+              <div><b>{f.name}</b><small>{f.place} · {f.offset}</small></div>
+            </div>
+          )
+        })}
+        <button className="plain tiny danger" onClick={() => { dispatch({ type: 'reset' }); go('splash', {}, true) }}>Reset the demo</button>
+      </div>
+    </div>
+  )
+}

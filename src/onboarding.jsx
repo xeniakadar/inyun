@@ -1,0 +1,211 @@
+// Screens 00a–00i: splash, the four intro slides, account, purpose, invite, all set.
+import { useRef } from 'react'
+import { FRIENDS, fileToDataUrl, timeIn } from './store.js'
+import { Art, Avatar, Icon, StatusBar } from './ui.jsx'
+
+const STEPS = 7
+
+function Dots({ step }) {
+  return (
+    <div className="dots" aria-label={`Step ${step + 1} of ${STEPS}`}>
+      {Array.from({ length: STEPS }, (_, i) => <i key={i} className={i === step ? 'on' : ''} />)}
+    </div>
+  )
+}
+
+function TopBar({ step, onBack, onSkip }) {
+  return (
+    <div className="ob-top">
+      {onBack ? <button className="plain" onClick={onBack} aria-label="Back"><Icon name="back" /></button> : <span className="spacer" />}
+      <Dots step={step} />
+      {onSkip ? <button className="plain skip" onClick={onSkip}>Skip</button> : <span className="spacer" />}
+    </div>
+  )
+}
+
+export function Splash({ onStart, onHave }) {
+  return (
+    <div className="screen grad grad-splash">
+      <StatusBar />
+      <div className="splash-mid">
+        <h1 className="serif logo">Inyun</h1>
+        <p>For the little things,<br />and the people you share them with.</p>
+      </div>
+      <div className="foot">
+        <button className="btn white" onClick={onStart}>Start your journey here <Icon name="arrow" size={14} stroke={2} /></button>
+        <button className="plain tiny" onClick={onHave}>I already have a board</button>
+      </div>
+    </div>
+  )
+}
+
+const SLIDES = [
+  {
+    grad: 'grad-peach', eyebrow: 'For the people far away', title: 'Stay close to your long distance besties.',
+    body: 'Leave notes, voice notes and photos on a shared board, whatever time it is where they are.',
+    art: () => (
+      <div className="ill ill-besties">
+        <span className="orb a" /><span className="orb b" />
+        <span className="chip c1">{timeIn('America/New_York')} New York</span>
+        <span className="chip c2">{timeIn('Europe/Budapest')} Budapest</span>
+      </div>
+    ),
+  },
+  {
+    grad: 'grad-sea', eyebrow: 'For the group chat', title: 'Plan the trip before you land.',
+    body: 'Pin restaurants, tickets and links in one place with your friends, then keep it all when you get home.',
+    art: () => (
+      <div className="ill ill-trip">
+        <svg viewBox="0 0 390 300" fill="none" stroke="#6b7c8f" strokeDasharray="3 5" strokeWidth="1.200"><path d="M-10 250C80 110 250 80 400 120" /><path d="M-10 300C110 180 260 160 400 190" /></svg>
+        {[[120, 150, '#7fc0a8'], [205, 125, '#7fb2d8'], [290, 135, '#8f95e6'], [55, 215, '#6fa4d6'], [178, 228, '#6fb0d0'], [272, 218, '#86cbb0'], [78, 280, '#7fc6a0']].map(([x, y, c], i) => (
+          <span key={i} className="blob" style={{ left: x, top: y, background: c }} />
+        ))}
+        <span className="chip c1">Lisbon, in 43 days</span>
+        <span className="chip c2">Dinner, 8 pm</span>
+      </div>
+    ),
+  },
+  {
+    grad: 'grad-lilac', eyebrow: 'For just you', title: 'Keep a journal worth looking at.',
+    body: 'A visual diary, a vision board, or a place to track the months. Your own board, kept for you.',
+    art: () => (
+      <div className="ill ill-journal">
+        <span className="card k1"><Art kind="flowers" /></span>
+        <span className="card k2 grad grad-splash" />
+        <span className="card k3"><Art kind="pizza" /></span>
+      </div>
+    ),
+  },
+  {
+    grad: 'grad-sun', eyebrow: 'Every month', title: 'Then walk back through it together.',
+    body: 'At the end of each month, your board becomes a recap of how far you came, and who came with you.',
+    cta: 'Set up my board',
+    art: () => (
+      <div className="ill ill-recap">
+        <svg viewBox="0 0 390 300" fill="none" stroke="#3a3528" strokeDasharray="2 5" strokeWidth="1.600" strokeLinecap="round"><path d="M0 232c60-8 90 14 150 2s70-52 130-58 80-10 110-14" /></svg>
+        <span className="orb a" /><span className="orb b" />
+        <span className="chip c1">OCT</span><span className="chip c2">NOV</span><span className="chip c3">DEC</span>
+      </div>
+    ),
+  },
+]
+
+export function Intro({ index, onNext, onBack, onSkip }) {
+  const s = SLIDES[index]
+  return (
+    <div className={`screen grad ${s.grad}`}>
+      <StatusBar />
+      <TopBar step={index} onBack={index > 0 ? onBack : null} onSkip={onSkip} />
+      {s.art()}
+      <div className="ob-panel">
+        <small>{s.eyebrow}</small>
+        <h2 className="serif">{s.title}</h2>
+        <p>{s.body}</p>
+        <button className="btn dark" onClick={onNext}>{s.cta || 'Continue'}</button>
+      </div>
+    </div>
+  )
+}
+export const INTRO_COUNT = SLIDES.length
+
+export function Setup({ user, dispatch, onNext, onBack }) {
+  const file = useRef(null)
+  const pick = async (e) => {
+    const f = e.target.files?.[0]
+    if (f) dispatch({ type: 'user', patch: { photo: await fileToDataUrl(f, 500) } })
+  }
+  return (
+    <div className="screen grad grad-setup">
+      <StatusBar />
+      <TopBar step={4} onBack={onBack} />
+      <div className="ob-head">
+        <h2 className="serif">Let's set you up.</h2>
+        <p>Your photo walks across your recaps.</p>
+      </div>
+      <button className="addphoto" onClick={() => file.current.click()}>
+        {user.photo ? <img src={user.photo} alt="Your photo" /> : 'Add photo'}
+      </button>
+      <input ref={file} type="file" accept="image/*" hidden onChange={pick} />
+      <form className="fields" onSubmit={(e) => { e.preventDefault(); onNext() }}>
+        <label>Your name
+          <input value={user.name} placeholder="Celine" autoComplete="given-name" onChange={(e) => dispatch({ type: 'user', patch: { name: e.target.value } })} />
+        </label>
+        <label>Email
+          <input type="email" value={user.email} placeholder="you@example.com" autoComplete="email" onChange={(e) => dispatch({ type: 'user', patch: { email: e.target.value } })} />
+        </label>
+        <div className="grow" />
+        <button className="btn dark">Create my account</button>
+      </form>
+    </div>
+  )
+}
+
+const PURPOSES = ['Long distance besties', 'Family', 'A trip with friends', 'My own journal', 'A vision board', 'Tracking my months']
+
+export function Purpose({ state, dispatch, onNext, onBack }) {
+  const toggle = (p) => {
+    const has = state.purposes.includes(p)
+    dispatch({ type: 'set', patch: { purposes: has ? state.purposes.filter((x) => x !== p) : [...state.purposes, p] } })
+  }
+  return (
+    <div className="screen grad grad-purpose">
+      <StatusBar />
+      <TopBar step={5} onBack={onBack} />
+      <div className="ob-head">
+        <h2 className="serif">What's your first board for?</h2>
+        <p>Pick as many as you like. You can make more later.</p>
+      </div>
+      <div className="chips">
+        {PURPOSES.map((p) => (
+          <button key={p} className={state.purposes.includes(p) ? 'on' : ''} aria-pressed={state.purposes.includes(p)} onClick={() => toggle(p)}>{p}</button>
+        ))}
+      </div>
+      <div className="grow" />
+      <div className="foot"><button className="btn dark" onClick={onNext}>Continue</button></div>
+    </div>
+  )
+}
+
+export function Invite({ state, dispatch, onNext, onBack }) {
+  const toggle = (id) => {
+    const has = state.invited.includes(id)
+    dispatch({ type: 'set', patch: { invited: has ? state.invited.filter((x) => x !== id) : [...state.invited, id] } })
+  }
+  return (
+    <div className="screen grad grad-invite">
+      <StatusBar />
+      <TopBar step={6} onBack={onBack} />
+      <div className="ob-head">
+        <h2 className="serif">Who are you missing?</h2>
+        <p>Invite them now, or start on your own.</p>
+      </div>
+      <div className="people">
+        {FRIENDS.slice(0, 3).map((f) => {
+          const on = state.invited.includes(f.id)
+          return (
+            <div className="person" key={f.id}>
+              <Avatar who={f.id} size={38} />
+              <div><b>{f.name}</b><small>{f.place}, {f.offset}</small></div>
+              <button className={`pill ${on ? 'on' : ''}`} onClick={() => toggle(f.id)}>{on ? 'Invited' : 'Invite'}</button>
+            </div>
+          )
+        })}
+      </div>
+      <div className="grow" />
+      <div className="foot"><button className="btn dark" onClick={onNext}>Continue</button></div>
+    </div>
+  )
+}
+
+export function AllSet({ onOpen }) {
+  return (
+    <div className="screen grad grad-allset">
+      <StatusBar />
+      <div className="splash-mid">
+        <h2 className="serif big">You're all set.</h2>
+        <p>Your board is empty for now.<br />That's where the journey starts.</p>
+      </div>
+      <div className="foot"><button className="btn white" onClick={onOpen}>Open my boards</button></div>
+    </div>
+  )
+}
