@@ -189,6 +189,8 @@ img { display: block; }
 .datesticker.tint { background: #fdf8c9; }
 .pin { position: absolute; touch-action: none; cursor: grab; user-select: none; transition: box-shadow 0.15s; }
 .pin.dragging { z-index: 20; cursor: grabbing; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.22)); }
+.boardhint { display: block; text-align: center; padding-top: 8px; flex: none; transition: filter 0.2s, opacity 0.2s; }
+.pill.honey { background: #dcbb52; }
 .hintrow { display: flex; align-items: center; justify-content: space-between; height: 46px; padding: 0 20px; flex: none; transition: filter 0.2s, opacity 0.2s; }
 .bottomnav { height: 88px; flex: none; display: grid; grid-template-columns: 1fr 1fr 64px 1fr 1fr; justify-items: center; align-items: start; padding: 6px 14px 0; position: relative; z-index: 12; }
 .bottomnav > button:not(.fab) { display: grid; justify-items: center; gap: 4px; font-size: 8px; letter-spacing: 0.14em; width: 64px; padding-top: 6px; color: #8b8b84; }
