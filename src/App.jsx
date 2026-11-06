@@ -4,6 +4,7 @@ import { AllSet, INTRO_COUNT, Intro, Invite, Purpose, Setup, Splash } from './on
 import { Board, Home, NewBoard, PinDetail, Settings } from './board.jsx'
 import { ListComposer, NoteComposer, TicketComposer, PhotoPicker, StickerPicker } from './compose.jsx'
 import { RecapPlayer, Recaps } from './recap.jsx'
+import { Activity, Friends } from './social.jsx'
 
 // A tiny screen stack instead of a router: go() pushes a screen, back() pops it.
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
   const go = (name, params = {}, replace = false) =>
     setStack((s) => {
       if (name === 'home' || name === 'splash') return [{ name }]
+      if (name === 'friends' || name === 'activity') return [{ name: 'home' }, { name }] // tabs sit directly on top of Home
       return [...(replace ? s.slice(0, -1) : s), { name, ...params }]
     })
   const back = () => setStack((s) => (s.length > 1 ? s.slice(0, -1) : [{ name: 'home' }]))
@@ -50,6 +52,8 @@ export default function App() {
     case 'ticket': screen = <TicketComposer {...p} id={route.id} pinId={route.pinId} />; break
     case 'recaps': screen = <Recaps {...p} id={route.id} />; break
     case 'recap': screen = <RecapPlayer {...p} id={route.id} month={route.month} />; break
+    case 'friends': screen = <Friends {...p} />; break
+    case 'activity': screen = <Activity {...p} />; break
     case 'settings': screen = <Settings {...p} />; break
     default: screen = <Home {...p} />
   }

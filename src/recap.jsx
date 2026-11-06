@@ -54,7 +54,7 @@ export function Recaps({ state, id, go, back }) {
         </button>
       </div>
       <div className="grow" />
-      <BottomNav go={go} onPlus={() => go('board', { id })} />
+      <BottomNav state={state} go={go} plusLabel="Back to the board" onPlus={() => go('board', { id })} />
     </div>
   )
 }

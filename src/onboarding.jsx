@@ -1,6 +1,6 @@
 // Screens 00a–00i: splash, the four intro slides, account, purpose, invite, all set.
-import { useRef } from 'react'
-import { FRIENDS, fileToDataUrl, timeIn } from './store.js'
+import { useRef, useState } from 'react'
+import { FRIENDS, fileToDataUrl, timeIn, toUsername } from './store.js'
 import { Art, Avatar, Icon, StatusBar } from './ui.jsx'
 
 const STEPS = 7
@@ -110,6 +110,7 @@ export const INTRO_COUNT = SLIDES.length
 
 export function Setup({ user, dispatch, onNext, onBack }) {
   const file = useRef(null)
+  const [touched, setTouched] = useState(Boolean(user.username))
   const pick = async (e) => {
     const f = e.target.files?.[0]
     if (f) dispatch({ type: 'user', patch: { photo: await fileToDataUrl(f, 500) } })
@@ -126,12 +127,27 @@ export function Setup({ user, dispatch, onNext, onBack }) {
         {user.photo ? <img src={user.photo} alt="Your photo" /> : 'Add photo'}
       </button>
       <input ref={file} type="file" accept="image/*" hidden onChange={pick} />
-      <form className="fields" onSubmit={(e) => { e.preventDefault(); onNext() }}>
+      <form className="fields scroll" onSubmit={(e) => { e.preventDefault(); onNext() }}>
         <label>Your name
-          <input value={user.name} placeholder="Celine" autoComplete="given-name" onChange={(e) => dispatch({ type: 'user', patch: { name: e.target.value } })} />
+          <input
+            value={user.name} placeholder="Celine" autoComplete="given-name"
+            // Until you type a username yourself, it follows your name.
+            onChange={(e) => dispatch({ type: 'user', patch: { name: e.target.value, ...(touched ? {} : { username: toUsername(e.target.value) }) } })}
+          />
+        </label>
+        <label>Username
+          <span className="at">
+            <input
+              value={user.username || ''} placeholder="celine" autoComplete="username" autoCapitalize="none" autoCorrect="off" required
+              onChange={(e) => { setTouched(true); dispatch({ type: 'user', patch: { username: toUsername(e.target.value) } }) }}
+            />
+          </span>
         </label>
         <label>Email
           <input type="email" value={user.email} placeholder="you@example.com" autoComplete="email" onChange={(e) => dispatch({ type: 'user', patch: { email: e.target.value } })} />
+        </label>
+        <label>Phone <i>optional, so friends can find you</i>
+          <input type="tel" value={user.phone || ''} placeholder="+1 555 010 0199" autoComplete="tel" onChange={(e) => dispatch({ type: 'user', patch: { phone: e.target.value } })} />
         </label>
         <div className="grow" />
         <button className="btn dark">Create my account</button>

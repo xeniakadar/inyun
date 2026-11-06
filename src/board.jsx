@@ -1,14 +1,22 @@
 // Home, New board, the board itself (with the + menu), pin detail, and Settings.
 import { useEffect, useRef, useState } from 'react'
-import { FRIENDS, MONTH, NEXT_MONTH, TODAY, boardTitle, fileToDataUrl, friend, timeIn, uid } from './store.js'
+import { MONTH, NEXT_MONTH, TODAY, boardTitle, fileToDataUrl, friend, hasNews, timeIn, uid } from './store.js'
 import { Art, Avatar, DateSticker, Icon, PinView, StatusBar } from './ui.jsx'
 
-export function BottomNav({ go, onPlus, open, current, plusLabel = 'Pin something' }) {
+// Home · Friends · + · Activity · Settings.
+export function BottomNav({ state, go, onPlus, open, current, plusLabel = 'Pin something' }) {
+  const tab = (name, icon, label, extra) => (
+    <button className={`tab t-${name}`} onClick={() => go(name)} aria-current={current === name ? 'page' : undefined}>
+      <span className="tabicon"><Icon name={icon} size={19} />{extra}</span><span>{label}</span>
+    </button>
+  )
   return (
     <nav className={`bottomnav ${open ? 'open' : ''}`}>
-      <button onClick={() => go('home')} aria-current={current === 'home' ? 'page' : undefined}><Icon name="home" size={18} /><span>HOME</span></button>
+      {tab('home', 'home', 'HOME')}
+      {tab('friends', 'friends', 'FRIENDS')}
       <button className="fab" onClick={onPlus} aria-label={open ? 'Close' : plusLabel}><Icon name={open ? 'x' : 'plus'} size={20} /></button>
-      <button onClick={() => go('settings')} aria-current={current === 'settings' ? 'page' : undefined}><Icon name="settings" size={18} /><span>SETTINGS</span></button>
+      {tab('activity', 'bell', 'ACTIVITY', state && hasNews(state) && <i className="dot" aria-label="New activity" />)}
+      {tab('settings', 'settings', 'SETTINGS')}
     </nav>
   )
 }
@@ -57,12 +65,12 @@ export function Home({ state, go }) {
           <span className="scrawl-sm">New Board</span>
         </button>
       </div>
-      <BottomNav go={go} current="home" plusLabel="New board" onPlus={() => go('newboard')} />
+      <BottomNav state={state} go={go} current="home" plusLabel="New board" onPlus={() => go('newboard')} />
     </div>
   )
 }
 
-export function NewBoard({ dispatch, go, back }) {
+export function NewBoard({ state, dispatch, go, back }) {
   const [picked, setPicked] = useState(['alex'])
   const toggle = (id) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
   const create = () => {
@@ -75,8 +83,8 @@ export function NewBoard({ dispatch, go, back }) {
       <StatusBar />
       <header className="bar"><button className="round" onClick={back} aria-label="Back"><Icon name="back" size={18} /></button></header>
       <h2 className="serif pad">Who's this board with?</h2>
-      <div className="people pad">
-        {FRIENDS.map((f) => {
+      <div className="people pad scroll">
+        {state.friends.map(friend).map((f) => {
           const on = picked.includes(f.id)
           return (
             <button className={`person pick ${on ? 'on' : ''}`} key={f.id} aria-pressed={on} onClick={() => toggle(f.id)}>
@@ -191,7 +199,7 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
           ))}
         </div>
       )}
-      <BottomNav go={go} open={menu} onPlus={() => setMenu((m) => !m)} />
+      <BottomNav state={state} go={go} open={menu} onPlus={() => setMenu((m) => !m)} />
     </div>
   )
 }
@@ -260,6 +268,7 @@ export function Settings({ state, dispatch, go, back }) {
         <p className="muted">This photo is the head that walks across your recaps.</p>
         <div className="face">
           <Avatar who="me" user={user} size={96} />
+          {(user.name || user.username) && <p className="whoami"><b>{user.name}</b>{user.username && <small>@{user.username}</small>}</p>}
           <button className="pill float" onClick={() => file.current.click()}>Change photo</button>
           <input ref={file} type="file" accept="image/*" hidden onChange={pick} />
         </div>

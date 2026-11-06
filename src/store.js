@@ -10,12 +10,21 @@ export const NEXT_MONTH = 'DEC'
 export const TODAY = 30
 
 export const FRIENDS = [
-  { id: 'alex', name: 'Alex', color: '#2f5d62', place: 'Budapest', tz: 'Europe/Budapest', offset: '6 hours ahead', km: 7000 },
-  { id: 'josh', name: 'Josh', color: '#4169d8', place: 'Brooklyn', tz: 'America/New_York', offset: 'same time', km: 0 },
-  { id: 'priya', name: 'Priya', color: '#d9ccf5', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
-  { id: 'sam', name: 'Sam', color: '#f3cdb4', light: true, place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
+  { id: 'alex', name: 'Alex', username: 'alex.bp', color: '#2f5d62', place: 'Budapest', tz: 'Europe/Budapest', offset: '6 hours ahead', km: 7000 },
+  { id: 'josh', name: 'Josh', username: 'joshh', color: '#4169d8', place: 'Brooklyn', tz: 'America/New_York', offset: 'same time', km: 0 },
+  { id: 'priya', name: 'Priya', username: 'priya.m', color: '#d9ccf5', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
+  { id: 'sam', name: 'Sam', username: 'samwise', color: '#f3cdb4', light: true, place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
 ]
-export const friend = (id) => FRIENDS.find((f) => f.id === id)
+// People who are on Inyun but not on your boards yet. They show up in Find friends.
+export const OTHERS = [
+  { id: 'mina', name: 'Mina', username: 'mina.k', color: '#b9a2ad', light: true, place: 'Seoul', tz: 'Asia/Seoul', offset: '14 hours ahead', km: 11000 },
+  { id: 'theo', name: 'Theo', username: 'theo', color: '#4f6b58', place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
+  { id: 'ines', name: 'Inês', username: 'ines.lx', color: '#dcbb52', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
+  { id: 'kai', name: 'Kai', username: 'kai.sg', color: '#6f2f35', place: 'Singapore', tz: 'Asia/Singapore', offset: '13 hours ahead', km: 15300 },
+  { id: 'noor', name: 'Noor', username: 'noor', color: '#a9bcc6', light: true, place: 'Amsterdam', tz: 'Europe/Amsterdam', offset: '6 hours ahead', km: 5900 },
+]
+export const PEOPLE = [...FRIENDS, ...OTHERS]
+export const friend = (id) => PEOPLE.find((f) => f.id === id)
 
 // What a list pin shows until someone writes their own.
 export const LIST_DEFAULT = {
@@ -62,10 +71,27 @@ const octoberPins = () => [
   { id: 'o6', type: 'photo', art: 'budapest', x: 160, y: 190, rot: -3, day: 27, by: 'alex' },
 ]
 
+// Friends, requests and notifications. Kept separate so boards saved before these existed still load.
+const social = () => ({
+  friends: FRIENDS.map((f) => f.id),
+  requests: ['mina'], // people asking to be your friend
+  sent: [], // people you have asked
+  requestsSeen: false,
+  notifs: [
+    { id: 'n1', who: 'alex', text: 'pinned a photo to your board', boardId: 'alex', when: '12 min ago' },
+    { id: 'n2', who: 'alex', text: 'left you a voice note', boardId: 'alex', when: '2 hours ago' },
+    { id: 'n3', who: 'priya', text: 'voted Lisbon on "where do we meet up?"', boardId: 'group', when: '5 hours ago' },
+    { id: 'n4', who: 'sam', text: 'added a sticker to your board', boardId: 'group', when: 'Yesterday', read: true },
+    { id: 'n5', who: 'josh', text: 'accepted your friend request', when: 'Yesterday', read: true },
+    { id: 'n6', text: 'Your October recap is ready to walk through', boardId: 'alex', recap: true, when: 'Nov 1', read: true },
+  ],
+})
+
 export function seed() {
   return {
+    ...social(),
     onboarded: false,
-    user: { name: '', email: '', photo: null },
+    user: { name: '', username: '', email: '', phone: '', photo: null },
     purposes: ['Long distance besties'],
     invited: ['alex'],
     boards: [
@@ -97,7 +123,7 @@ export function seed() {
 function load() {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) return { ...social(), ...JSON.parse(raw) }
   } catch {}
   return seed()
 }
@@ -117,6 +143,17 @@ function reducer(state, a) {
     case 'removePin': return mapBoard(state, a.boardId, (b) => ({ ...b, pins: b.pins.filter((p) => p.id !== a.pinId) }))
     case 'comment': return mapPin(state, a.boardId, a.pinId, (p) => ({ ...p, comments: [...(p.comments || []), a.comment] }))
     case 'vote': return mapPin(state, a.boardId, a.pinId, (p) => ({ ...p, vote: a.option }))
+    case 'sendRequest': return { ...state, sent: [...state.sent, a.id] }
+    case 'cancelRequest': return { ...state, sent: state.sent.filter((x) => x !== a.id) }
+    case 'declineRequest': return { ...state, requests: state.requests.filter((x) => x !== a.id) }
+    case 'acceptRequest':
+      return {
+        ...state,
+        requests: state.requests.filter((x) => x !== a.id),
+        friends: [...state.friends, a.id],
+        notifs: [{ id: uid(), who: a.id, text: 'is now one of your people', when: 'Just now', read: true }, ...state.notifs],
+      }
+    case 'readNotifs': return { ...state, requestsSeen: true, notifs: state.notifs.map((n) => ({ ...n, read: true })) }
     case 'reset': return seed()
     default: return state
   }
@@ -129,6 +166,12 @@ export function useStore() {
   }, [state])
   return [state, dispatch]
 }
+
+// True when the bell should show its dot.
+export const hasNews = (state) => state.notifs.some((n) => !n.read) || (state.requests.length > 0 && !state.requestsSeen)
+
+// "Celine Wu" -> "celine.wu": a starting point for the username field.
+export const toUsername = (text) => text.toLowerCase().trim().replace(/\s+/g, '.').replace(/[^a-z0-9._]/g, '').slice(0, 20)
 
 export function boardTitle(board, user) {
   const me = user.name || 'You'
