@@ -337,9 +337,11 @@ img { display: block; }
 .recap-pin { animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1); }
 @keyframes pop { from { opacity: 0; scale: 0.5; } to { opacity: 1; scale: 1; } }
 .walk { height: 170px; position: relative; flex: none; }
-.walkers { position: absolute; bottom: 34px; display: flex; transition: left 0.3s linear; }
+.walkers { position: absolute; left: 0; bottom: 34px; display: flex; will-change: transform; }
 .walker { display: grid; justify-items: center; }
 .walker + .walker { margin-left: -8px; }
+/* four or more walkers: tuck them closer so the group fits */
+.walkers:has(.walker:nth-child(4)) .walker + .walker { margin-left: -16px; }
 .walker.flip svg { transform: scaleX(-1); }
 .leg { transform-origin: 23px 36px; }
 .walk.go .leg.l { animation: swing 0.45s ease-in-out infinite alternate; }
