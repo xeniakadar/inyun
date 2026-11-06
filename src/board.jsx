@@ -182,12 +182,11 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
           ))}
         </div>
       </div>
-      <span className={`caps boardhint ${menu ? 'blurred' : ''}`}>{pins.length ? 'TAP TO ZOOM · SWIPE FOR MORE' : 'PRESS + TO PIN SOMETHING'}</span>
       <div className={`hintrow ${menu ? 'blurred' : ''}`}>
-        {newMonth ? <span /> : <button className="pill float honey" onClick={() => go('recaps', { id })}><Icon name="arrow" size={12} stroke={2} /> Recaps</button>}
+        <span className="caps">{pins.length ? 'TAP TO ZOOM · SWIPE FOR MORE' : 'PRESS + TO PIN SOMETHING'}</span>
         {newMonth
-          ? <button className="pill float" onClick={() => go('recaps', { id })}>Your {MONTH} recap <Icon name="arrow" size={12} stroke={2} /></button>
-          : pins.length > 0 && <button className="pill float" onClick={() => go('newmonth', { id })}>Skip to Dec 1 <Icon name="arrow" size={12} stroke={2} /></button>}
+          ? <button className="pill float honey" onClick={() => go('recaps', { id })}>Your {MONTH} recap <Icon name="arrow" size={12} stroke={2} /></button>
+          : <button className="pill float honey" onClick={() => go('recaps', { id })}><Icon name="arrow" size={12} stroke={2} /> Recaps</button>}
       </div>
       {showHint && <button className="toast hint" onClick={hintDone}>Drag to move · tap to open</button>}
       {menu && (

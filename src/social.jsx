@@ -65,7 +65,7 @@ export function Friends({ state, dispatch, go }) {
             {section('PEOPLE YOU MAY KNOW', suggested)}
           </>
         )}
-        <button className="person pick dashed" onClick={invite}><Icon name="plus" size={18} /><b>Invite someone far away</b></button>
+        <button className="person pick dashed" onClick={invite}><Icon name="plus" size={18} /><b>Invite someone you miss</b></button>
       </div>
       <BottomNav state={state} go={go} current="friends" plusLabel="New board" onPlus={() => go('newboard')} />
       <Toast text={toast} />
