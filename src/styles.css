@@ -178,7 +178,7 @@ img { display: block; }
 .board-head h1 { flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .canvas { flex: 1; margin: 4px 12px 0; border-radius: 22px; overflow-x: auto; overflow-y: hidden; background-color: #f4f4f0; background-image: radial-gradient(#e2e2dc 1px, transparent 1px); background-size: 7px 7px; transition: filter 0.2s, opacity 0.2s; scrollbar-width: none; }
 .canvas::-webkit-scrollbar, .rail::-webkit-scrollbar { display: none; }
-.canvas-inner { position: relative; width: 1050px; height: 100%; min-height: 420px; }
+.canvas-inner { position: relative; width: 1400px; height: 100%; min-height: 420px; }
 .blurred { filter: blur(7px); opacity: 0.55; pointer-events: none; }
 .datebtn { position: absolute; left: 16px; top: 12px; }
 .datesticker { width: 42px; background: #fff; box-shadow: var(--shadow); text-align: center; transform: rotate(-3deg); position: relative; }
@@ -428,3 +428,6 @@ img { display: block; }
   .boardcard:hover .thumb { transform: translateY(calc(var(--pop) * -4px)) scale(calc(1 + var(--pop) * 0.03)) rotate(calc(var(--tilt, 0deg) * 0.25)); box-shadow: 0 14px 28px rgba(40, 36, 20, 0.16), 0 2px 5px rgba(40, 36, 20, 0.08); }
   .boardcard:hover .thumb .pin { --spread: calc(var(--pop) * 11px); }
 }
+
+/* profile photos are often taller than wide: keep the face, not the middle of the picture, in the circle */
+.avatar img { object-position: 50% 26%; }

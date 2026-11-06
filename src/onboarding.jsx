@@ -93,9 +93,9 @@ const SLIDES = [
     body: 'A visual diary, a vision board, or a place to track the months. Your own board, kept for you.',
     art: () => (
       <div className="ill ill-journal">
-        <span className="card k1"><Art kind="nyc" /></span>
-        <span className="card k2"><Art kind="friends" /></span>
-        <span className="card k3"><Art kind="drinks" /></span>
+        <span className="card k1"><Art kind="flowers" /></span>
+        <span className="card k2"><Art kind="fun2" /></span>
+        <span className="card k3"><Art kind="sushi" /></span>
       </div>
     ),
   },

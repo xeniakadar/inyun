@@ -115,7 +115,7 @@ function ArtSvg({ kind }) {
 }
 
 // Which file in public/photos each photo name uses. The older names still work, so saved boards pick up the real photos too.
-const PHOTO_FILES = { portrait: 'me', parliament: 'budapest', pizza: 'drinks', flowers: 'friends', skyline: 'nyc' }
+const PHOTO_FILES = { portrait: 'me', parliament: 'budapest2', pizza: 'drinks', skyline: 'nyc' }
 
 export function Art({ kind, src, className = '' }) {
   const [failed, setFailed] = useState(false)
@@ -138,6 +138,13 @@ export function Avatar({ who, user, size = 30, ring }) {
     )
   }
   const f = friend(who)
+  if (f.photo) {
+    return (
+      <span className={`avatar ${ring ? 'ring' : ''}`} style={style}>
+        <img src={`${import.meta.env.BASE_URL}photos/${f.photo}.jpg`} alt="" draggable={false} />
+      </span>
+    )
+  }
   return (
     <span className={`avatar ${ring ? 'ring' : ''}`} style={{ ...style, background: f.color, color: f.light ? '#3b3350' : '#fff' }}>
       {f.name[0]}
