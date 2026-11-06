@@ -190,6 +190,7 @@ img { display: block; }
 .bottomnav.open { pointer-events: none; }
 .bottomnav.open > button:not(.fab) { visibility: hidden; }
 .bottomnav.open .fab { pointer-events: auto; }
+.bottomnav > button[aria-current='page'] { font-weight: 700; }
 .addmenu { position: absolute; inset: 0; z-index: 10; animation: fade 0.2s; }
 .menuitem { position: absolute; display: grid; justify-items: center; gap: 8px; transform: translateX(-50%); }
 .m0 { left: 32%; bottom: 114px; }
@@ -311,3 +312,4 @@ img { display: block; }
 .summary p { font-size: 25px; line-height: 1.25; margin: 4px 0 16px; }
 .summary .pill { margin-right: 8px; height: 38px; }
 .toast { position: absolute; left: 50%; bottom: 110px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 22px; font-size: 13px; font-weight: 500; white-space: nowrap; z-index: 30; animation: pop 0.3s ease; }
+.toast.hint { bottom: 148px; }

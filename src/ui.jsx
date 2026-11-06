@@ -107,9 +107,12 @@ function ArtSvg({ kind }) {
   )
 }
 
+// Which file in public/photos each photo name uses. The older names still work, so saved boards pick up the real photos too.
+const PHOTO_FILES = { portrait: 'me', parliament: 'budapest', pizza: 'drinks', flowers: 'friends', skyline: 'nyc' }
+
 export function Art({ kind, src, className = '' }) {
   const [failed, setFailed] = useState(false)
-  const url = src || `/photos/${kind === 'portrait' ? 'me' : kind}.jpg`
+  const url = src || `${import.meta.env.BASE_URL}photos/${PHOTO_FILES[kind] || kind}.jpg`
   return (
     <span className={`art ${className}`}>
       {!src && <ArtSvg kind={kind} />}

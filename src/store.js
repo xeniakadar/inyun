@@ -27,29 +27,31 @@ const novemberPins = () => [
   { id: 'p1', type: 'lined', title: 'Thank you.', text: 'i am so lucky you pick up at 3am. every time.', x: 12, y: 62, rot: -2, day: 3, by: 'alex' },
   { id: 'p2', type: 'ticket', from: 'NYC', to: 'BUD', line: 'ADMIT ONE · DEC 19', seat: 'SEAT 14A', x: 14, y: 232, rot: -3, day: 3, by: 'me' },
   {
-    id: 'p3', type: 'photo', art: 'parliament', x: 122, y: 34, rot: 3, day: 8, by: 'alex',
+    id: 'p3', type: 'photo', art: 'budapest', x: 122, y: 34, rot: 3, day: 8, by: 'alex',
     comments: [{ by: 'alex', text: 'remember that night walk along the danube? i miss u', meta: 'ALEX · BUDAPEST · 2:14 AM' }],
   },
   { id: 'p4', type: 'voice', dur: 13, x: 108, y: 178, rot: 3, day: 8, by: 'alex' },
   { id: 'p5', type: 'note', text: 'I miss you...', color: NOTE_COLORS[0], x: 128, y: 226, rot: -3, day: 13, by: 'me' },
-  { id: 'p6', type: 'photo', art: 'pizza', x: 252, y: 54, rot: -3, day: 18, by: 'me' },
-  { id: 'p7', type: 'photo', art: 'flowers', x: 262, y: 176, rot: 4, day: 18, by: 'alex' },
+  { id: 'p6', type: 'photo', art: 'drinks', x: 252, y: 54, rot: -3, day: 18, by: 'me' },
+  { id: 'p7', type: 'photo', art: 'friends', x: 262, y: 176, rot: 4, day: 18, by: 'alex' },
   { id: 'p8', type: 'strip', x: 384, y: 30, rot: 2, day: 24, by: 'me' },
   { id: 'p9', type: 'license', x: 382, y: 232, rot: -2, day: 24, by: 'alex' },
   { id: 'p10', type: 'poll', q: 'miss me?', options: ['yes', 'also yes'], x: 452, y: 40, rot: 3, day: 26, by: 'alex' },
   { id: 'p11', type: 'receipt', x: 470, y: 130, rot: 1, day: 28, by: 'me' },
   { id: 'p12', type: 'place', label: 'BUDAPEST', x: 596, y: 130, rot: -2, day: 30, by: 'alex' },
   { id: 'p13', type: 'sticker', emoji: '❤️', x: 610, y: 180, rot: 8, day: 30, by: 'me' },
+  { id: 'p15', type: 'photo', art: 'nyc', x: 596, y: 4, rot: -2, day: 29, by: 'me',
+    comments: [{ by: 'me', text: 'the sky did this tonight. wish you saw it', meta: 'NEW YORK · 5:02 PM' }] },
   { id: 'p14', type: 'sticker', emoji: '✳️', x: 650, y: 240, rot: 0, day: 30, by: 'alex' },
 ]
 
 const octoberPins = () => [
   { id: 'o1', type: 'note', text: 'landed. it is so cold here', color: NOTE_COLORS[3], x: 20, y: 60, rot: -2, day: 2, by: 'alex' },
-  { id: 'o2', type: 'photo', art: 'skyline', x: 150, y: 50, rot: 3, day: 6, by: 'me' },
+  { id: 'o2', type: 'photo', art: 'nyc', x: 150, y: 50, rot: 3, day: 6, by: 'me' },
   { id: 'o3', type: 'voice', dur: 21, x: 40, y: 190, rot: -2, day: 11, by: 'me' },
   { id: 'o4', type: 'sticker', emoji: '🌙', x: 250, y: 200, rot: 0, day: 15, by: 'alex' },
   { id: 'o5', type: 'note', text: 'first week at the new job. did not cry', color: NOTE_COLORS[4], x: 260, y: 60, rot: 2, day: 21, by: 'me' },
-  { id: 'o6', type: 'photo', art: 'pizza', x: 160, y: 190, rot: -3, day: 27, by: 'alex' },
+  { id: 'o6', type: 'photo', art: 'budapest', x: 160, y: 190, rot: -3, day: 27, by: 'alex' },
 ]
 
 export function seed() {
@@ -62,7 +64,7 @@ export function seed() {
       {
         id: 'solo', members: [], hue: 'pink',
         pins: [
-          { id: 's1', type: 'photo', art: 'flowers', x: 150, y: 30, rot: 3, day: 5, by: 'me' },
+          { id: 's1', type: 'photo', art: 'nyc', x: 150, y: 30, rot: 3, day: 5, by: 'me' },
           { id: 's2', type: 'note', text: 'first week at the new job. did not cry', color: NOTE_COLORS[4], x: 26, y: 150, rot: -2, day: 5, by: 'me' },
           { id: 's3', type: 'sticker', emoji: '✳️', x: 150, y: 190, rot: 0, day: 5, by: 'me' },
           { id: 's4', type: 'license', x: 96, y: 262, rot: 2, day: 5, by: 'me' },
@@ -72,7 +74,7 @@ export function seed() {
       {
         id: 'group', members: ['josh', 'priya', 'sam'], hue: 'lilac',
         pins: [
-          { id: 'g1', type: 'photo', art: 'pizza', x: 150, y: 26, rot: 2, day: 5, by: 'priya' },
+          { id: 'g1', type: 'photo', art: 'drinks', x: 150, y: 26, rot: 2, day: 5, by: 'priya' },
           { id: 'g2', type: 'note', text: 'this place. next time. your treat.', color: NOTE_COLORS[3], x: 28, y: 160, rot: -2, day: 5, by: 'josh' },
           { id: 'g3', type: 'voice', dur: 13, x: 16, y: 280, rot: 0, day: 5, by: 'sam' },
           { id: 'g4', type: 'receipt', x: 162, y: 190, rot: 2, day: 5, by: 'me' },
@@ -101,7 +103,7 @@ function reducer(state, a) {
     case 'user': return { ...state, user: { ...state.user, ...a.patch } }
     case 'set': return { ...state, ...a.patch }
     case 'addBoard': return { ...state, boards: [...state.boards, a.board] }
-    case 'addPin': return mapBoard(state, a.boardId, (b) => ({ ...b, pins: [...b.pins, a.pin] }))
+    case 'addPin': return { ...mapBoard(state, a.boardId, (b) => ({ ...b, pins: [...b.pins, a.pin] })), dragHint: state.dragHint || 'show' }
     case 'movePin': return mapPin(state, a.boardId, a.pinId, (p) => ({ ...p, x: a.x, y: a.y }))
     case 'removePin': return mapBoard(state, a.boardId, (b) => ({ ...b, pins: b.pins.filter((p) => p.id !== a.pinId) }))
     case 'comment': return mapPin(state, a.boardId, a.pinId, (p) => ({ ...p, comments: [...(p.comments || []), a.comment] }))

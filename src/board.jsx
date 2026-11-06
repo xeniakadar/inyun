@@ -1,14 +1,14 @@
 // Home, New board, the board itself (with the + menu), pin detail, and Settings.
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FRIENDS, MONTH, NEXT_MONTH, TODAY, boardTitle, fileToDataUrl, friend, timeIn, uid } from './store.js'
 import { Art, Avatar, DateSticker, Icon, PinView, StatusBar } from './ui.jsx'
 
-export function BottomNav({ go, onPlus, open }) {
+export function BottomNav({ go, onPlus, open, current, plusLabel = 'Pin something' }) {
   return (
     <nav className={`bottomnav ${open ? 'open' : ''}`}>
-      <button onClick={() => go('home')}><Icon name="home" size={18} /><span>HOME</span></button>
-      <button className="fab" onClick={onPlus} aria-label={open ? 'Close' : 'Pin something'}><Icon name={open ? 'x' : 'plus'} size={20} /></button>
-      <button onClick={() => go('settings')}><Icon name="settings" size={18} /><span>SETTINGS</span></button>
+      <button onClick={() => go('home')} aria-current={current === 'home' ? 'page' : undefined}><Icon name="home" size={18} /><span>HOME</span></button>
+      <button className="fab" onClick={onPlus} aria-label={open ? 'Close' : plusLabel}><Icon name={open ? 'x' : 'plus'} size={20} /></button>
+      <button onClick={() => go('settings')} aria-current={current === 'settings' ? 'page' : undefined}><Icon name="settings" size={18} /><span>SETTINGS</span></button>
     </nav>
   )
 }
@@ -57,6 +57,7 @@ export function Home({ state, go }) {
           <span className="scrawl-sm">New Board</span>
         </button>
       </div>
+      <BottomNav go={go} current="home" plusLabel="New board" onPlus={() => go('newboard')} />
     </div>
   )
 }
@@ -140,9 +141,17 @@ const MENU = [
 export function Board({ state, dispatch, id, go, back, newMonth }) {
   const [menu, setMenu] = useState(false)
   const board = state.boards.find((b) => b.id === id)
-  if (!board) return null
   const { user } = state
-  const pins = newMonth ? [] : board.pins
+  const pins = newMonth || !board ? [] : board.pins
+  // Shown once, after the first thing you pin yourself. Any touch on a pin (or 8 seconds) retires it for good.
+  const showHint = state.dragHint === 'show' && pins.length > 0 && !menu
+  const hintDone = () => state.dragHint === 'show' && dispatch({ type: 'set', patch: { dragHint: 'done' } })
+  useEffect(() => {
+    if (!showHint) return
+    const t = setTimeout(hintDone, 8000)
+    return () => clearTimeout(t)
+  }, [showHint]) // eslint-disable-line
+  if (!board) return null
   return (
     <div className="screen paper">
       <StatusBar />
@@ -158,8 +167,8 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
           {pins.map((p) => (
             <DraggablePin
               key={p.id} pin={p} user={user}
-              onMove={(x, y) => dispatch({ type: 'movePin', boardId: id, pinId: p.id, x, y })}
-              onOpen={() => go('pin', { id, pinId: p.id })}
+              onMove={(x, y) => { hintDone(); dispatch({ type: 'movePin', boardId: id, pinId: p.id, x, y }) }}
+              onOpen={() => { hintDone(); go('pin', { id, pinId: p.id }) }}
               onVote={(option) => dispatch({ type: 'vote', boardId: id, pinId: p.id, option })}
             />
           ))}
@@ -171,6 +180,7 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
           ? <button className="pill float" onClick={() => go('recaps', { id })}>Your {MONTH} recap <Icon name="arrow" size={12} stroke={2} /></button>
           : pins.length > 0 && <button className="pill float" onClick={() => go('newmonth', { id })}>Skip to Dec 1 <Icon name="arrow" size={12} stroke={2} /></button>}
       </div>
+      {showHint && <button className="toast hint" onClick={hintDone}>Drag to move · tap to open</button>}
       {menu && (
         <div className="addmenu" onClick={() => setMenu(false)}>
           {MENU.map((m, i) => (

@@ -97,10 +97,10 @@ export function NoteComposer({ dispatch, id, back, voiceFirst }) {
   )
 }
 
-const GALLERY = ['flowers', 'parliament', 'pizza', 'skyline']
+const GALLERY = ['friends', 'budapest', 'drinks', 'nyc']
 
 export function PhotoPicker({ dispatch, id, back }) {
-  const [sel, setSel] = useState({ art: 'flowers' })
+  const [sel, setSel] = useState({ art: 'friends' })
   const [uploads, setUploads] = useState([])
   const file = useRef(null)
   const pick = async (e) => {
