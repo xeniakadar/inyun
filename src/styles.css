@@ -284,7 +284,7 @@ img { display: block; }
 /* pin detail */
 .detail-top { height: 46%; position: relative; flex: none; display: grid; place-items: center; background: #f4f4f0; }
 .detail-top.photo { background: #000; clip-path: polygon(0 0, 100% 0, 100% 98%, 95% 100%, 90% 98%, 85% 100%, 80% 98%, 75% 100%, 70% 98%, 65% 100%, 60% 98%, 55% 100%, 50% 98%, 45% 100%, 40% 98%, 35% 100%, 30% 98%, 25% 100%, 20% 98%, 15% 100%, 10% 98%, 5% 100%, 0 98%); }
-.detail-pin { transform: scale(1.8); }
+.detail-pin { transform: scale(1.5); max-width: 62%; display: grid; justify-items: center; }
 .overlay { position: absolute; left: 18px; top: 56px; z-index: 6; }
 .detail-notes { padding: 22px 24px 30px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
 .comment { display: flex; gap: 12px; }
@@ -330,7 +330,7 @@ img { display: block; }
 .summary p { font-size: 25px; line-height: 1.25; margin: 4px 0 16px; }
 .summary .pill { margin-right: 8px; height: 38px; }
 .toast { position: absolute; left: 50%; bottom: 110px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 22px; font-size: 13px; font-weight: 500; white-space: nowrap; z-index: 30; animation: pop 0.3s ease; }
-.toast.hint { bottom: 148px; }
+.toast.hint { bottom: 176px; }
 
 /* list (receipt) */
 .pin-receipt .total { display: flex; gap: 10px; }
@@ -381,3 +381,9 @@ img { display: block; }
 .objectgrid button { height: 58px; display: grid; place-items: center; border-radius: 10px; padding: 4px; }
 .objectgrid button.on { background: #efecd6; }
 .objectgrid .object-img { max-width: 100%; max-height: 50px; width: auto !important; object-fit: contain; }
+
+/* poll maker */
+.preview-pin.small { transform: scale(1.25) rotate(2deg); }
+.withx { display: flex; gap: 8px; align-items: center; }
+.withx input { flex: 1; }
+.ticketfields .person.wide { height: 48px; }

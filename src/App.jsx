@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useStore } from './store.js'
 import { AllSet, INTRO_COUNT, Intro, Invite, Purpose, Setup, Splash } from './onboarding.jsx'
 import { Board, Home, NewBoard, PinDetail, Settings } from './board.jsx'
-import { ListComposer, NoteComposer, TicketComposer, PhotoPicker, StickerPicker } from './compose.jsx'
+import { ListComposer, NoteComposer, PollComposer, TicketComposer, PhotoPicker, StickerPicker } from './compose.jsx'
 import { RecapPlayer, Recaps } from './recap.jsx'
 import { Activity, Friends } from './social.jsx'
 
@@ -50,6 +50,7 @@ export default function App() {
     case 'sticker': screen = <StickerPicker {...p} id={route.id} />; break
     case 'list': screen = <ListComposer {...p} id={route.id} pinId={route.pinId} />; break
     case 'ticket': screen = <TicketComposer {...p} id={route.id} pinId={route.pinId} />; break
+    case 'poll': screen = <PollComposer {...p} id={route.id} pinId={route.pinId} />; break
     case 'recaps': screen = <Recaps {...p} id={route.id} />; break
     case 'recap': screen = <RecapPlayer {...p} id={route.id} month={route.month} />; break
     case 'friends': screen = <Friends {...p} />; break

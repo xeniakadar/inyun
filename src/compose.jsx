@@ -154,7 +154,7 @@ export function StickerPicker({ dispatch, id, back, go }) {
         {extras.map((x) => (
           <button key={x.key} className={`pin-chip ${x.cls || ''}`} onClick={() => { const s = x.make(); if (s) setSel(s) }}>{x.node}</button>
         ))}
-        <button className="pin-chip" onClick={() => setSel({ type: 'poll', q: 'miss me?', options: ['yes', 'also yes'] })}>miss me?</button>
+        <button className="pin-chip" onClick={() => go('poll', { id }, true)}><Icon name="poll" size={13} /> poll</button>
         <button className="pin-chip" onClick={() => go('list', { id }, true)}><Icon name="list" size={13} /> list</button>
         <button className="pin-chip" onClick={() => go('ticket', { id }, true)}><Icon name="ticket" size={13} /> ticket</button>
       </div>
@@ -253,6 +253,48 @@ export function TicketComposer({ state, dispatch, id, pinId, back }) {
         </div>
       </div>
       <div className="recrow"><button className="btn dark" disabled={!ready} onClick={save}>{existing ? 'Save ticket' : 'Pin to board'}</button></div>
+    </div>
+  )
+}
+
+// A poll sticker: your own question and two to four answers.
+// Opened with a pinId it edits that poll instead of making a new one.
+export function PollComposer({ state, dispatch, id, pinId, back }) {
+  const existing = pinId && state.boards.find((b) => b.id === id)?.pins.find((p) => p.id === pinId)
+  const [q, setQ] = useState(existing?.q ?? '')
+  const [options, setOptions] = useState(existing?.options ?? ['', ''])
+  const setOption = (i, v) => setOptions((o) => o.map((x, k) => (k === i ? v : x)))
+  const answers = options.map((o) => o.trim()).filter(Boolean)
+  const ready = q.trim() && answers.length >= 2 && new Set(answers).size === answers.length
+  const save = () => {
+    const data = { q: q.trim(), options: answers }
+    // A vote for an answer that no longer exists is dropped.
+    if (existing) dispatch({ type: 'updatePin', boardId: id, pinId, patch: { ...data, vote: answers.includes(existing.vote) ? existing.vote : undefined } })
+    else dispatch({ type: 'addPin', boardId: id, pin: drop({ type: 'poll', ...data }) })
+    back()
+  }
+  return (
+    <div className="screen paper">
+      <StatusBar />
+      <Header back={back} title={existing ? 'Edit poll' : 'Make a poll'} />
+      <div className="scroll grow">
+        <div className="preview dotted ticket">
+          <div className="preview-pin small"><PinView pin={{ type: 'poll', q: q.trim() || 'miss me?', options: answers.length >= 2 ? answers : ['yes', 'also yes'] }} /></div>
+        </div>
+        <div className="ticketfields">
+          <label className="wide">Question<input value={q} placeholder="miss me?" maxLength={40} autoFocus={!existing} onChange={(e) => setQ(e.target.value)} /></label>
+          {options.map((o, i) => (
+            <label className="wide" key={i}>Answer {i + 1}
+              <span className="withx">
+                <input value={o} placeholder={['yes', 'also yes', 'obviously', 'ask me later'][i]} maxLength={24} onChange={(e) => setOption(i, e.target.value)} />
+                {options.length > 2 && <button type="button" className="round" onClick={() => setOptions((x) => x.filter((_, k) => k !== i))} aria-label={`Remove answer ${i + 1}`}><Icon name="x" size={14} /></button>}
+              </span>
+            </label>
+          ))}
+          {options.length < 4 && <button className="person pick dashed wide" onClick={() => setOptions((x) => [...x, ''])}><Icon name="plus" size={18} /><b>Add an answer</b></button>}
+        </div>
+      </div>
+      <div className="recrow"><button className="btn dark" disabled={!ready} onClick={save}>{existing ? 'Save poll' : 'Pin to board'}</button></div>
     </div>
   )
 }
