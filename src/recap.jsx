@@ -74,12 +74,34 @@ function Walker({ who, user, flip }) {
   )
 }
 
-const DURATION = 14000
+// The recap spaces a month's pins out so it reads as time passing: one lands, a day or three go by, the next lands.
+// Order is kept (earliest first, then the order things were pinned); only the spacing is evened out, so a burst of
+// pins added in one sitting does not all appear on the same day. First pin lands on day 2, last on day 30.
+const GAPS = [2, 1, 3, 1, 2, 1, 1, 3, 2, 1]
+export function spreadOverMonth(pins) {
+  const ordered = pins.map((p, i) => ({ p, i })).sort((a, b) => a.p.day - b.p.day || a.i - b.i).map((x) => x.p)
+  if (ordered.length < 2) return ordered.map((p) => ({ ...p, day: 30 }))
+  let sum = 0
+  const at = ordered.map((_, k) => (sum += GAPS[k % GAPS.length]))
+  const span = at[at.length - 1] - at[0]
+  const days = at.map((a) => Math.round(2 + ((a - at[0]) / span) * 28))
+  // With up to 29 pins there is room for each to have its own day: nudge any that rounded onto the same one.
+  if (days.length <= 29) {
+    for (let k = 1; k < days.length; k++) days[k] = Math.max(days[k], days[k - 1] + 1)
+    for (let k = days.length - 1; k >= 0; k--) days[k] = Math.min(days[k], 30 - (days.length - 1 - k))
+  }
+  return ordered.map((p, k) => ({ ...p, day: days[k] }))
+}
+
+// About a second per pin, so a full month does not rush past and a quiet one does not drag.
+const durationFor = (count) => Math.min(26000, Math.max(14000, count * 1000))
+const zoomFor = (count) => (count <= 12 ? 0.8 : count <= 18 ? 0.72 : count <= 26 ? 0.6 : 0.5)
 
 export function RecapPlayer({ state, id, month, back }) {
   const board = state.boards.find((b) => b.id === id)
   const { user } = state
-  const pins = (month === MONTH ? board.pins : board.archive?.[month] || []).slice().sort((a, b) => a.day - b.day)
+  const pins = spreadOverMonth(month === MONTH ? board.pins : board.archive?.[month] || [])
+  const duration = durationFor(pins.length)
   const [t, setT] = useState(0)
   const [playing, setPlaying] = useState(true)
   const [toast, setToast] = useState('')
@@ -93,7 +115,7 @@ export function RecapPlayer({ state, id, month, back }) {
       const dt = now - last.current
       last.current = now
       setT((v) => {
-        const next = Math.min(1, v + dt / DURATION)
+        const next = Math.min(1, v + dt / duration)
         if (next >= 1) setPlaying(false)
         return next
       })
@@ -101,7 +123,7 @@ export function RecapPlayer({ state, id, month, back }) {
     }
     raf = requestAnimationFrame(step)
     return () => cancelAnimationFrame(raf)
-  }, [playing])
+  }, [playing, duration])
 
   const done = t >= 1
   const day = Math.max(1, Math.round(t * 30))
@@ -120,7 +142,7 @@ export function RecapPlayer({ state, id, month, back }) {
         <h1 className="serif spaced">{boardTitle(board, user)}</h1>
       </header>
       <div className={`recap ${done ? 'dim' : ''}`}>
-        <div className="recap-pins">
+        <div className="recap-pins" style={{ zoom: zoomFor(pins.length) }}>
           <DateSticker month={month} day={day} tint />
           {shown.map((p) => (
             <span key={p.id} className="recap-pin" style={{ transform: `rotate(${p.rot}deg)` }}><PinView pin={p} user={user} /></span>

@@ -62,6 +62,14 @@ const novemberPins = () => [
   { id: 'p13', type: 'sticker', name: 'heart', x: 610, y: 180, rot: 8, day: 30, by: 'me' },
   { id: 'p15', type: 'photo', art: 'nyc', x: 596, y: 4, rot: -2, day: 29, by: 'me',
     comments: [{ by: 'me', text: 'the sky did this tonight. wish you saw it', meta: 'NEW YORK · 5:02 PM' }] },
+  { id: 'p16', type: 'note', text: "the bakery closed. i'm devastated.", color: NOTE_COLORS[3], x: 724, y: 34, rot: 2, day: 6, by: 'alex' },
+  { id: 'p17', type: 'object', name: 'camera', x: 852, y: 52, rot: -8, day: 10, by: 'me' },
+  { id: 'p18', type: 'countdown', label: 'DAYS UNTIL YOU', n: 43, x: 744, y: 176, rot: -3, day: 11, by: 'alex' },
+  { id: 'p19', type: 'song', label: 'our song', x: 846, y: 150, rot: 3, day: 15, by: 'me' },
+  { id: 'p20', type: 'note', text: 'i got the job?!', color: NOTE_COLORS[1], x: 880, y: 196, rot: 3, day: 20, by: 'me' },
+  { id: 'p21', type: 'object', name: 'envelope', x: 740, y: 268, rot: -4, day: 22, by: 'alex' },
+  { id: 'p22', type: 'time', label: '2:14 AM', x: 838, y: 316, rot: -2, day: 25, by: 'alex' },
+  { id: 'p23', type: 'sticker', name: 'moon', x: 962, y: 104, rot: 0, day: 27, by: 'alex' },
   { id: 'p14', type: 'sticker', name: 'asterisk', x: 650, y: 240, rot: 0, day: 30, by: 'alex' },
 ]
 

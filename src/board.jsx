@@ -117,7 +117,7 @@ function DraggablePin({ pin, user, onMove, onOpen, onVote }) {
     const dx = e.clientX - s.px, dy = e.clientY - s.py
     if (!s.moved && Math.hypot(dx, dy) < 5) return
     s.moved = true
-    setPos({ x: Math.max(-10, Math.min(640, s.x + dx)), y: Math.max(0, Math.min(400, s.y + dy)) })
+    setPos({ x: Math.max(-10, Math.min(940, s.x + dx)), y: Math.max(0, Math.min(400, s.y + dy)) })
   }
   const up = () => {
     const s = start.current

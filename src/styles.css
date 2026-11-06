@@ -177,7 +177,7 @@ img { display: block; }
 .board-head h1 { flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .canvas { flex: 1; margin: 4px 12px 0; border-radius: 22px; overflow-x: auto; overflow-y: hidden; background-color: #f4f4f0; background-image: radial-gradient(#e2e2dc 1px, transparent 1px); background-size: 7px 7px; transition: filter 0.2s, opacity 0.2s; scrollbar-width: none; }
 .canvas::-webkit-scrollbar, .rail::-webkit-scrollbar { display: none; }
-.canvas-inner { position: relative; width: 760px; height: 100%; min-height: 420px; }
+.canvas-inner { position: relative; width: 1050px; height: 100%; min-height: 420px; }
 .blurred { filter: blur(7px); opacity: 0.55; pointer-events: none; }
 .datebtn { position: absolute; left: 16px; top: 12px; }
 .datesticker { width: 42px; background: #fff; box-shadow: var(--shadow); text-align: center; transform: rotate(-3deg); position: relative; }
