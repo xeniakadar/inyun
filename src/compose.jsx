@@ -1,6 +1,6 @@
 // The four things you can pin: note, voice, photo, sticker.
 import { useEffect, useRef, useState } from 'react'
-import { LIST_DEFAULT, NOTE_COLORS, TODAY, fileToDataUrl, timeIn, uid } from './store.js'
+import { LIST_DEFAULT, NOTE_COLORS, TICKET_COLORS, TODAY, fileToDataUrl, timeIn, uid } from './store.js'
 import { STICKER_NAMES, Sticker } from './stickers.jsx'
 import { Art, Icon, PinView, StatusBar, Wave, clock } from './ui.jsx'
 
@@ -152,6 +152,7 @@ export function StickerPicker({ dispatch, id, back, go }) {
         ))}
         <button className="pin-chip" onClick={() => setSel({ type: 'poll', q: 'miss me?', options: ['yes', 'also yes'] })}>miss me?</button>
         <button className="pin-chip" onClick={() => go('list', { id }, true)}><Icon name="list" size={13} /> list</button>
+        <button className="pin-chip" onClick={() => go('ticket', { id }, true)}><Icon name="ticket" size={13} /> ticket</button>
       </div>
       <div className="stickergrid">
         {STICKER_NAMES.map((s) => (
@@ -201,6 +202,47 @@ export function ListComposer({ state, dispatch, id, pinId, back }) {
         <span className="caps">ONE THING PER LINE · "1x" IS ADDED FOR YOU</span>
       </div>
       <div className="recrow"><button className="btn dark" disabled={!lines.length} onClick={save}>{existing ? 'Save list' : 'Pin to board'}</button></div>
+    </div>
+  )
+}
+
+// A boarding-pass sticker: where from, where to, when, which seat, and the colour of the stub.
+// Opened with a pinId it edits that ticket instead of making a new one.
+export function TicketComposer({ state, dispatch, id, pinId, back }) {
+  const existing = pinId && state.boards.find((b) => b.id === id)?.pins.find((p) => p.id === pinId)
+  const [t, setT] = useState(() => ({
+    from: existing?.from || '', to: existing?.to || '', date: existing?.date || '', dep: existing?.dep || '', arr: existing?.arr || '',
+    seat: (existing?.seat || '').replace(/^seat\s*/i, ''), color: existing?.color || TICKET_COLORS[0],
+  }))
+  const set = (key, clean = (v) => v) => (e) => setT((v) => ({ ...v, [key]: clean(e.target.value) }))
+  const code = (v) => v.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4)
+  const ready = t.from && t.to
+  const save = () => {
+    if (existing) dispatch({ type: 'updatePin', boardId: id, pinId, patch: { ...t, line: undefined } })
+    else dispatch({ type: 'addPin', boardId: id, pin: drop({ type: 'ticket', ...t }) })
+    back()
+  }
+  return (
+    <div className="screen paper">
+      <StatusBar />
+      <Header back={back} title={existing ? 'Edit ticket' : 'Make a ticket'} />
+      <div className="scroll grow">
+        <div className="preview dotted ticket"><div className="preview-pin"><PinView pin={{ type: 'ticket', ...t }} /></div></div>
+        <div className="bar swatches" role="group" aria-label="Ticket colour">
+          {TICKET_COLORS.map((c) => (
+            <button key={c} className={`swatch ${c === t.color ? 'on' : ''}`} style={{ background: c }} aria-label={`Ticket colour ${c}`} aria-pressed={c === t.color} onClick={() => setT((v) => ({ ...v, color: c }))} />
+          ))}
+        </div>
+        <div className="ticketfields">
+          <label>From<input value={t.from} placeholder="NYC" autoCapitalize="characters" autoFocus={!existing} onChange={set('from', code)} /></label>
+          <label>To<input value={t.to} placeholder="BUD" autoCapitalize="characters" onChange={set('to', code)} /></label>
+          <label className="wide">Date<input type="date" value={t.date} onChange={set('date')} /></label>
+          <label>Departs<input type="time" value={t.dep} onChange={set('dep')} /></label>
+          <label>Arrives<input type="time" value={t.arr} onChange={set('arr')} /></label>
+          <label className="wide">Seat<input value={t.seat} placeholder="14A" maxLength={5} autoCapitalize="characters" onChange={set('seat', (v) => v.toUpperCase())} /></label>
+        </div>
+      </div>
+      <div className="recrow"><button className="btn dark" disabled={!ready} onClick={save}>{existing ? 'Save ticket' : 'Pin to board'}</button></div>
     </div>
   )
 }

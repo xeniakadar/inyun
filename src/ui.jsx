@@ -1,6 +1,6 @@
 // Shared building blocks: icons, avatars, placeholder art, and every kind of pin.
 import { useEffect, useRef, useState } from 'react'
-import { LIST_DEFAULT, friend } from './store.js'
+import { LIST_DEFAULT, TICKET_COLORS, friend } from './store.js'
 import { Sticker } from './stickers.jsx'
 
 const paths = {
@@ -18,6 +18,7 @@ const paths = {
   check: <path d="m5 12.500 4.500 4.500L19 7.500" />,
   music: <><path d="M9 18V6l10-2v12" /><circle cx="6.500" cy="18" r="2.500" /><circle cx="16.500" cy="16" r="2.500" /></>,
   link: <path d="M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1M14 10a4 4 0 0 0-5.700 0l-3 3a4 4 0 0 0 5.700 5.700l1-1" />,
+  ticket: <path d="M3.500 9V6.500h17V9a3 3 0 0 0 0 6v2.500h-17V15a3 3 0 0 0 0-6zM14 6.500v11" />,
   list: <path d="M9 7h11M9 12h11M9 17h11M4.500 7h.01M4.500 12h.01M4.500 17h.01" />,
   place: <><path d="M12 21s7-6.200 7-11.500a7 7 0 0 0-14 0C5 14.800 12 21 12 21z" /><circle cx="12" cy="9.500" r="2.300" /></>,
   settings: <><circle cx="12" cy="12" r="3" /><path d="M19.400 13.500a7.600 7.600 0 0 0 0-3l2-1.500-2-3.500-2.400 1a7.600 7.600 0 0 0-2.600-1.500L14 2.500h-4l-.4 2.500A7.600 7.600 0 0 0 7 6.500l-2.400-1-2 3.500 2 1.500a7.600 7.600 0 0 0 0 3l-2 1.500 2 3.500 2.400-1a7.600 7.600 0 0 0 2.600 1.500l.4 2.500h4l.4-2.500a7.600 7.600 0 0 0 2.600-1.500l2.400 1 2-3.500z" /></>,
@@ -185,6 +186,16 @@ function Voice({ pin }) {
 // "pizza" becomes "1x pizza"; a line that already starts with a count ("2x tickets") is left alone.
 export const listLine = (item) => (/^\d+\s*x\b/i.test(item.trim()) ? item.trim() : `1x ${item.trim()}`)
 
+// Tickets keep the raw form values ("2026-12-19", "18:40") so they can be edited later; these turn them into "DEC 19" and "6:40 PM".
+const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+const ticketDate = (iso) => { const [, m, d] = (iso || '').split('-').map(Number); return m && d ? `${MONTHS[m - 1]} ${d}` : '' }
+const ticketTime = (t) => { const [h, m] = (t || '').split(':').map(Number); return Number.isFinite(h) && Number.isFinite(m) ? `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}` : '' }
+export function ticketLine(pin) {
+  if (pin.line) return pin.line // tickets saved before the ticket maker existed
+  const dep = ticketTime(pin.dep), arr = ticketTime(pin.arr)
+  return [ticketDate(pin.date), dep && arr ? `${dep} → ${arr}` : dep || arr].filter(Boolean).join(' · ')
+}
+
 const Tack = () => <span className="tack" aria-hidden="true" />
 
 export function PinView({ pin, user, onVote }) {
@@ -205,10 +216,10 @@ export function PinView({ pin, user, onVote }) {
       return <Voice pin={pin} />
     case 'ticket':
       return (
-        <div className="pin-ticket">
-          <b>{pin.from}→{pin.to}</b>
-          <span>{pin.line}</span>
-          <span className="blue">{pin.seat}</span>
+        <div className="pin-ticket" style={{ borderLeftColor: pin.color || TICKET_COLORS[0] }}>
+          <b>{pin.from || 'FROM'}→{pin.to || 'TO'}</b>
+          {ticketLine(pin) && <span>{ticketLine(pin)}</span>}
+          {pin.seat && <span style={{ color: pin.color || TICKET_COLORS[0] }}>{/^seat/i.test(pin.seat) ? pin.seat : `SEAT ${pin.seat}`}</span>}
         </div>
       )
     case 'receipt':

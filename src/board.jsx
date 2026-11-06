@@ -232,6 +232,9 @@ export function PinDetail({ state, dispatch, id, pinId, go, back }) {
         {pin.by === 'me' && pin.type === 'receipt' && (
           <button className="pill float edit" onClick={() => go('list', { id, pinId })}>Edit list</button>
         )}
+        {pin.by === 'me' && pin.type === 'ticket' && (
+          <button className="pill float edit" onClick={() => go('ticket', { id, pinId })}>Edit ticket</button>
+        )}
         {pin.by === 'me' && (
           <button className="plain tiny danger" onClick={() => { dispatch({ type: 'removePin', boardId: id, pinId }); back() }}>Take this off the board</button>
         )}

@@ -25,6 +25,7 @@ export const LIST_DEFAULT = {
   footer: 'Soon, please',
 }
 
+export const TICKET_COLORS = ['#3f66d6', '#6f2f35', '#4f6b58', '#dcbb52', '#b9a2ad', '#1f2128']
 export const NOTE_COLORS = ['#fdf8c9', '#f6d9c4', '#d9ead9', '#d6e3fb', '#e2d9f7']
 
 let n = 0
@@ -32,7 +33,7 @@ export const uid = () => `${Date.now().toString(36)}${(n++).toString(36)}`
 
 const novemberPins = () => [
   { id: 'p1', type: 'lined', title: 'Thank you.', text: 'i am so lucky you pick up at 3am. every time.', x: 12, y: 62, rot: -2, day: 3, by: 'alex' },
-  { id: 'p2', type: 'ticket', from: 'NYC', to: 'BUD', line: 'ADMIT ONE · DEC 19', seat: 'SEAT 14A', x: 14, y: 232, rot: -3, day: 3, by: 'me' },
+  { id: 'p2', type: 'ticket', from: 'NYC', to: 'BUD', date: '2026-12-19', dep: '18:40', arr: '08:55', seat: '14A', color: TICKET_COLORS[0], x: 14, y: 232, rot: -3, day: 3, by: 'me' },
   {
     id: 'p3', type: 'photo', art: 'budapest', x: 122, y: 34, rot: 3, day: 8, by: 'alex',
     comments: [{ by: 'alex', text: 'remember that night walk along the danube? i miss u', meta: 'ALEX · BUDAPEST · 2:14 AM' }],

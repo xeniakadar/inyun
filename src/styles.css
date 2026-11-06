@@ -214,7 +214,7 @@ img { display: block; }
 .wave i { width: 2px; border-radius: 1px; background: currentColor; }
 .wave.active i { animation: bounce 0.7s ease-in-out infinite alternate; }
 @keyframes bounce { from { transform: scaleY(0.4); } to { transform: scaleY(1.15); } }
-.pin-ticket { width: 112px; background: #fff; border-left: 12px solid var(--blue); padding: 7px 8px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); display: grid; font-size: 6px; letter-spacing: 0.06em; gap: 1px; }
+.pin-ticket { min-width: 112px; width: max-content; white-space: nowrap; background: #fff; border-left: 12px solid var(--blue); padding: 7px 8px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); display: grid; font-size: 6px; letter-spacing: 0.06em; gap: 1px; }
 .pin-ticket b { font-size: 12px; letter-spacing: 0; }
 .pin-ticket .blue { color: var(--blue); }
 .pin-receipt { width: 96px; background: #fffef6; padding: 9px 8px 22px; display: grid; gap: 2px; font-size: 5.500px; letter-spacing: 0.04em; text-transform: uppercase; word-break: break-word; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); clip-path: polygon(0 0, 100% 0, 100% 96%, 92% 100%, 84% 96%, 76% 100%, 68% 96%, 60% 100%, 52% 96%, 44% 100%, 36% 96%, 28% 100%, 20% 96%, 12% 100%, 4% 96%, 0 100%); }
@@ -328,3 +328,10 @@ img { display: block; }
 .receipt-edit hr { border: 0; border-top: 1.500px dashed #55554f; width: 72%; margin: 4px 0; justify-self: start; }
 .receipt-edit label { display: flex; gap: 22px; align-items: center; font-size: 16px; }
 .pill.edit { align-self: flex-start; margin-top: 8px; }
+
+/* ticket maker */
+.preview.dotted.ticket { height: 150px; margin-bottom: 4px; }
+.ticketfields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 6px 20px 10px; }
+.ticketfields label { font-size: 13px; display: grid; gap: 6px; min-width: 0; }
+.ticketfields .wide { grid-column: 1 / -1; }
+.ticketfields input { height: 48px; border-radius: 14px; border: 1.200px solid #dcdcdc; padding: 0 14px; font-size: 16px; background: #fff; width: 100%; min-width: 0; }
