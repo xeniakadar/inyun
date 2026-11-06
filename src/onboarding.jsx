@@ -1,5 +1,5 @@
 // Screens 00a–00i: splash, the four intro slides, account, purpose, invite, all set.
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FRIENDS, fileToDataUrl, timeIn, toUsername } from './store.js'
 import { Art, Avatar, Icon, Logo, StatusBar } from './ui.jsx'
 
@@ -114,14 +114,33 @@ const SLIDES = [
   },
 ]
 
+// The illustrations are drawn for a 340px-tall band. On shorter phones the band shrinks, so they scale down to fit it.
+function useFit(ref, designHeight) {
+  const [scale, setScale] = useState(1)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const fit = () => setScale(Math.min(1, el.clientHeight / designHeight))
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [ref, designHeight])
+  return scale
+}
+
 export function Intro({ index, onNext, onBack, onSkip }) {
   const s = SLIDES[index]
+  const band = useRef(null)
+  const scale = useFit(band, 340)
   return (
     <div className={`screen grad live ${s.grad}`}>
       <Aurora palette={s.palette} />
       <StatusBar />
       <TopBar step={index} onBack={index > 0 ? onBack : null} onSkip={onSkip} />
-      {s.art()}
+      <div className="ill-band" ref={band}>
+        <div className="ill-fit" style={{ transform: `translateX(-50%) scale(${scale})` }}>{s.art()}</div>
+      </div>
       <div className="ob-panel">
         <small>{s.eyebrow}</small>
         <h2 className="serif">{s.title}</h2>
@@ -153,7 +172,8 @@ export function Setup({ user, dispatch, onNext, onBack }) {
         {user.photo ? <img src={user.photo} alt="Your photo" /> : 'Add photo'}
       </button>
       <input ref={file} type="file" accept="image/*" hidden onChange={pick} />
-      <form className="fields scroll" onSubmit={(e) => { e.preventDefault(); onNext() }}>
+      <form className="fields" onSubmit={(e) => { e.preventDefault(); onNext() }}>
+        <div className="fieldlist scroll">
         <label>Your name
           <input
             value={user.name} placeholder="Celine" autoComplete="given-name"
@@ -175,7 +195,7 @@ export function Setup({ user, dispatch, onNext, onBack }) {
         <label>Phone <i>optional, so friends can find you</i>
           <input type="tel" value={user.phone || ''} placeholder="+1 555 010 0199" autoComplete="tel" onChange={(e) => dispatch({ type: 'user', patch: { phone: e.target.value } })} />
         </label>
-        <div className="grow" />
+        </div>
         <button className="btn dark">Create my account</button>
       </form>
     </div>

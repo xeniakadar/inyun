@@ -89,7 +89,10 @@ img { display: block; }
 .dots { display: flex; gap: 5px; align-items: center; }
 .dots i { width: 5px; height: 5px; border-radius: 3px; background: rgba(31, 33, 40, 0.3); transition: width 0.2s; }
 .dots i.on { width: 30px; background: var(--ink); }
-.ill { position: absolute !important; inset: 90px 0 auto 0; height: 340px; }
+/* the band between the top bar and the white panel; the art is centred in it and scaled down when it is short */
+.ill-band { position: absolute; left: 0; right: 0; top: 90px; bottom: calc(48% + 26px); z-index: 1; }
+.ill-fit { position: absolute; left: 50%; top: 50%; width: 390px; height: 340px; margin-top: -170px; transform-origin: 50% 50%; }
+.ill { position: absolute !important; inset: 0; }
 .ill svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .chip { position: absolute; background: #fff; border-radius: 16px; padding: 6px 12px; font-size: 12px; font-weight: 500; box-shadow: var(--shadow); white-space: nowrap; }
 .orb { position: absolute; border-radius: 50%; }
@@ -102,9 +105,9 @@ img { display: block; }
 .ill-trip .c1 { left: 148px; top: 42px; }
 .ill-trip .c2 { left: 40px; top: 246px; }
 .ill-journal .card { position: absolute; border-radius: 12px; border: 5px solid #fff; overflow: hidden; box-shadow: var(--shadow); }
-.ill-journal .k1 { left: 60px; top: 70px; width: 120px; height: 172px; transform: rotate(-7deg); }
-.ill-journal .k2 { left: 186px; top: 56px; width: 124px; height: 180px; transform: rotate(4deg); }
-.ill-journal .k3 { left: 126px; top: 178px; width: 150px; height: 128px; transform: rotate(-1deg); }
+.ill-journal .k1 { left: 60px; top: 36px; width: 120px; height: 172px; transform: rotate(-7deg); }
+.ill-journal .k2 { left: 186px; top: 22px; width: 124px; height: 180px; transform: rotate(4deg); }
+.ill-journal .k3 { left: 126px; top: 146px; width: 150px; height: 128px; transform: rotate(-1deg); }
 .ill-recap .orb { width: 42px; height: 42px; top: 150px; }
 .ill-recap .a { left: 180px; top: 164px; background: radial-gradient(circle at 35% 30%, #fff 0, #f6c48c 60%, #ef9f5a 100%); }
 .ill-recap .b { left: 214px; background: radial-gradient(circle at 35% 30%, #fff 0, #f0b8d8 60%, #e592c2 100%); }
@@ -123,6 +126,7 @@ img { display: block; }
 .addphoto { width: 88px; height: 88px; border-radius: 50%; background: #fff; box-shadow: var(--shadow); margin: 26px auto 16px; font-size: 12px; overflow: hidden; flex: none; position: relative; z-index: 1; }
 .addphoto img { width: 100%; height: 100%; object-fit: cover; }
 .fields { flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 4px 28px 34px; min-height: 0; }
+.fieldlist { display: flex; flex-direction: column; gap: 10px; min-height: 0; padding-bottom: 6px; }
 .fields .btn { flex: none; margin-top: 8px; }
 .fields i { font-style: normal; color: var(--muted); font-size: 11px; }
 .at { position: relative; display: block; }
