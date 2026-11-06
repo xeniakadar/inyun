@@ -125,8 +125,8 @@ function DraggablePin({ pin, user, onMove, onOpen, onVote }) {
   const move = (e) => {
     const s = start.current
     if (!s) return
-    const dx = e.clientX - s.px, dy = e.clientY - s.py
-    if (!s.moved && Math.hypot(dx, dy) < 5) return
+    const dx = (e.clientX - s.px) / BOARD_ZOOM, dy = (e.clientY - s.py) / BOARD_ZOOM
+    if (!s.moved && Math.hypot(dx, dy) < 4) return
     s.moved = true
     setPos({ x: Math.max(-10, Math.min(1290, s.x + dx)), y: Math.max(0, Math.min(400, s.y + dy)) })
   }
@@ -164,7 +164,9 @@ function placeBurst(el) {
   })
 }
 
-const PAGE = 330 // one swipe moves this far; the canvas is 366 wide, so the next page always peeks in
+// Everything on the board is drawn at this scale so notes and lists are readable; pin positions stay in unscaled units.
+export const BOARD_ZOOM = 1.4
+const PAGE = 350 // the demo boards are laid out in 350-unit columns; a swipe settles on the next column
 
 const MENU = [
   { key: 'photo', icon: 'image', label: 'PHOTO' },
@@ -201,7 +203,7 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
         <h1 className="serif spaced">{boardTitle(board, user)}</h1>
       </header>
       <div className={`canvas ${menu ? 'blurred' : ''} ${more ? 'has-more' : ''}`} ref={canvas} onScroll={checkMore}>
-        <div className="canvas-inner">
+        <div className="canvas-inner" style={{ zoom: BOARD_ZOOM }}>
           {/* snap points every page width, so a swipe lands with a sliver of the next page showing */}
           {[0, 1, 2, 3].map((n) => <i key={n} className="snap" style={{ left: n * PAGE }} />)}
           <button className="plain datebtn" onClick={() => go('recaps', { id })} aria-label="Open recaps">

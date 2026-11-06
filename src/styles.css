@@ -180,9 +180,9 @@ img { display: block; }
 .spaced { font-size: 18px; letter-spacing: 0.06em; font-weight: 400; }
 .board-head { display: flex; align-items: center; gap: 10px; padding: 4px 18px; height: 56px; flex: none; }
 .board-head h1 { flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.canvas { flex: 1; margin: 4px 12px 0; border-radius: 22px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-padding-left: 0; background-color: #f4f4f0; background-image: radial-gradient(#e2e2dc 1px, transparent 1px); background-size: 7px 7px; transition: filter 0.2s, opacity 0.2s; scrollbar-width: none; }
+.canvas { flex: 1; margin: 4px 12px 0; border-radius: 22px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; scroll-padding-left: 0; background-color: #f4f4f0; background-image: radial-gradient(#e2e2dc 1px, transparent 1px); background-size: 7px 7px; transition: filter 0.2s, opacity 0.2s; scrollbar-width: none; }
 .canvas::-webkit-scrollbar, .rail::-webkit-scrollbar { display: none; }
-.canvas-inner { position: relative; width: 1400px; height: 100%; min-height: 420px; }
+.canvas-inner { position: relative; width: 1400px; height: calc(100% / 1.4); min-height: 300px; }
 .blurred { filter: blur(7px); opacity: 0.55; pointer-events: none; }
 .datebtn { position: absolute; left: 16px; top: 12px; }
 .datesticker { width: 42px; background: #fff; box-shadow: var(--shadow); text-align: center; transform: rotate(-3deg); position: relative; }
@@ -239,14 +239,14 @@ img { display: block; }
 .tack::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 36% 30%, #fff 0 9%, #8fa698 16%, #5f7a69 55%, #3c5246 100%); }
 .tack.big { width: 26px; height: 26px; margin-left: -13px; top: -6px; }
 .pin-note-wrap { position: relative; filter: drop-shadow(0 3px 5px rgba(60, 50, 10, 0.2)); }
-.pin-note { width: 106px; min-height: 100px; padding: 18px 10px 10px; font-size: 9.500px; line-height: 18px; word-break: break-word; clip-path: polygon(0% 3px, 4% 1px, 8% 3.5px, 12% 1.5px, 17% 3px, 22% 0.5px, 27% 2.5px, 33% 1px, 38% 3.2px, 44% 1.5px, 50% 3px, 56% 0.8px, 62% 2.8px, 68% 1.2px, 74% 3.4px, 80% 1px, 86% 2.6px, 92% 0.6px, 96% 2.4px, 100% 1px, 100% 100%, 0 100%); background-size: 100% 100%, 100% 9px; background-position: 0 0, 0 5px; }
+.pin-note { width: 116px; min-height: 110px; padding: 20px 11px 11px; font-size: 10.500px; line-height: 18px; word-break: break-word; clip-path: polygon(0% 3px, 4% 1px, 8% 3.5px, 12% 1.5px, 17% 3px, 22% 0.5px, 27% 2.5px, 33% 1px, 38% 3.2px, 44% 1.5px, 50% 3px, 56% 0.8px, 62% 2.8px, 68% 1.2px, 74% 3.4px, 80% 1px, 86% 2.6px, 92% 0.6px, 96% 2.4px, 100% 1px, 100% 100%, 0 100%); background-size: 100% 100%, 100% 9px; background-position: 0 0, 0 5px; }
 /* ruled, slightly creased paper: a soft crease highlight over evenly spaced rules */
 .paperlines { background-image: linear-gradient(112deg, rgba(255, 255, 255, 0.2) 0 16%, transparent 32% 52%, rgba(70, 55, 10, 0.05) 66%, transparent 84%), repeating-linear-gradient(to bottom, transparent 0 calc(100% - 1px), rgba(95, 80, 30, 0.07) calc(100% - 1px) 100%); }
-.pin-lined { width: 96px; padding: 6px 9px 12px; background: #fdf3b4; background-image: repeating-linear-gradient(transparent 0 15px, #e8d98a 15px 16px); background-position: 0 30px; box-shadow: 0 3px 8px rgba(60, 50, 10, 0.16); font-size: 10.500px; line-height: 16px; }
+.pin-lined { width: 104px; padding: 6px 9px 12px; background: #fdf3b4; background-image: repeating-linear-gradient(transparent 0 15px, #e8d98a 15px 16px); background-position: 0 30px; box-shadow: 0 3px 8px rgba(60, 50, 10, 0.16); font-size: 10.500px; line-height: 16px; }
 .pin-lined small { display: block; text-align: right; font-size: 6px; color: var(--blue); line-height: 10px; }
 .pin-lined b { color: var(--blue); font-size: 14px; display: block; line-height: 20px; }
 .pin-lined p { line-height: 16px; }
-.pin-photo { width: 112px; height: 118px; padding: 6px; background: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); position: relative; }
+.pin-photo { width: 132px; height: 140px; padding: 7px; background: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); position: relative; }
 .pin-photo.large { width: 200px; height: 232px; padding: 10px; transform: rotate(3deg); }
 .pin-voice { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px 0 6px; border-radius: 13px; background: var(--ink); color: #fff; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); }
 .pin-voice small { font-size: 8px; opacity: 0.8; }
@@ -258,7 +258,7 @@ img { display: block; }
 .pin-ticket { min-width: 112px; width: max-content; white-space: nowrap; background: #fff; border-left: 12px solid var(--blue); padding: 7px 8px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); display: grid; font-size: 6px; letter-spacing: 0.06em; gap: 1px; }
 .pin-ticket b { font-size: 12px; letter-spacing: 0; }
 .pin-ticket .blue { color: var(--blue); }
-.pin-receipt { width: 96px; background: #fffef6; padding: 9px 8px 22px; display: grid; gap: 2px; font-size: 5.500px; letter-spacing: 0.04em; text-transform: uppercase; word-break: break-word; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); clip-path: polygon(0 0, 100% 0, 100% 96%, 92% 100%, 84% 96%, 76% 100%, 68% 96%, 60% 100%, 52% 96%, 44% 100%, 36% 96%, 28% 100%, 20% 96%, 12% 100%, 4% 96%, 0 100%); }
+.pin-receipt { width: 116px; background: #fffef6; padding: 11px 10px 26px; display: grid; gap: 2.500px; font-size: 6.800px; letter-spacing: 0.04em; text-transform: uppercase; word-break: break-word; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); clip-path: polygon(0 0, 100% 0, 100% 96%, 92% 100%, 84% 96%, 76% 100%, 68% 96%, 60% 100%, 52% 96%, 44% 100%, 36% 96%, 28% 100%, 20% 96%, 12% 100%, 4% 96%, 0 100%); }
 .pin-receipt hr { border: 0; border-top: 1px dashed #999; width: 100%; margin: 2px 0; }
 .pin-strip { width: 46px; background: #fff; padding: 4px; display: grid; gap: 4px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18); }
 .pin-strip span { height: 42px; display: block; overflow: hidden; filter: grayscale(1); }
@@ -330,8 +330,9 @@ img { display: block; }
 .recap { flex: 1; display: flex; flex-direction: column; transition: opacity 0.4s; min-height: 0; }
 .recap.dim { opacity: 0.35; pointer-events: none; }
 .recap-pins { flex: 1; min-height: 0; position: relative; overflow: hidden; }
-.recap-collage { position: relative; width: 390px; }
+.recap-collage { position: relative; width: 390px; transition: transform 0.9s ease-in-out; }
 .recap-date { position: absolute; left: 10px; top: 6px; z-index: 5; }
+.recap-pins > .datesticker-fixed { position: absolute; left: 14px; top: 8px; z-index: 6; transform: rotate(-3deg) scale(1.15); }
 .recap-pin { position: absolute; }
 .recap-date .datesticker { transform: rotate(-3deg) scale(1.25); }
 .recap-pin { animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1); }
