@@ -9,19 +9,21 @@ export const MONTH_NAME = 'November'
 export const NEXT_MONTH = 'DEC'
 export const TODAY = 30
 
+// The ids ('alex', 'josh', ...) are internal labels that saved boards point at, so they stay as they are.
+// Change `name` and `username` to rename someone; nothing else needs to change.
 export const FRIENDS = [
-  { id: 'alex', name: 'Alex', username: 'alex.bp', color: '#2f5d62', place: 'Budapest', tz: 'Europe/Budapest', offset: '6 hours ahead', km: 7000 },
-  { id: 'josh', name: 'Josh', username: 'joshh', color: '#4169d8', place: 'Brooklyn', tz: 'America/New_York', offset: 'same time', km: 0 },
-  { id: 'priya', name: 'Priya', username: 'priya.m', color: '#d9ccf5', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
-  { id: 'sam', name: 'Sam', username: 'samwise', color: '#f3cdb4', light: true, place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
+  { id: 'alex', name: 'Christy', username: 'christy', color: '#2f5d62', place: 'Budapest', tz: 'Europe/Budapest', offset: '6 hours ahead', km: 7000 },
+  { id: 'josh', name: 'Noah', username: 'noah', color: '#4169d8', place: 'Brooklyn', tz: 'America/New_York', offset: 'same time', km: 0 },
+  { id: 'priya', name: 'Ella', username: 'ella', color: '#d9ccf5', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
+  { id: 'sam', name: 'Sam', username: 'sam', color: '#f3cdb4', light: true, place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
 ]
 // People who are on Inyun but not on your boards yet. They show up in Find friends.
 export const OTHERS = [
-  { id: 'mina', name: 'Mina', username: 'mina.k', color: '#b9a2ad', light: true, place: 'Seoul', tz: 'Asia/Seoul', offset: '14 hours ahead', km: 11000 },
-  { id: 'theo', name: 'Theo', username: 'theo', color: '#4f6b58', place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
-  { id: 'ines', name: 'Inês', username: 'ines.lx', color: '#dcbb52', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
-  { id: 'kai', name: 'Kai', username: 'kai.sg', color: '#6f2f35', place: 'Singapore', tz: 'Asia/Singapore', offset: '13 hours ahead', km: 15300 },
-  { id: 'noor', name: 'Noor', username: 'noor', color: '#a9bcc6', light: true, place: 'Amsterdam', tz: 'Europe/Amsterdam', offset: '6 hours ahead', km: 5900 },
+  { id: 'mina', name: 'Xenia', username: 'xenia', color: '#b9a2ad', light: true, place: 'Seoul', tz: 'Asia/Seoul', offset: '14 hours ahead', km: 11000 },
+  { id: 'theo', name: 'Ashley', username: 'ashley', color: '#4f6b58', place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
+  { id: 'ines', name: 'Niu-Niu', username: 'niuniu', color: '#dcbb52', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
+  { id: 'kai', name: 'Viraj', username: 'viraj', color: '#6f2f35', place: 'Singapore', tz: 'Asia/Singapore', offset: '13 hours ahead', km: 15300 },
+  { id: 'noor', name: 'Fred', username: 'fred', color: '#a9bcc6', light: true, place: 'Amsterdam', tz: 'Europe/Amsterdam', offset: '6 hours ahead', km: 5900 },
 ]
 export const PEOPLE = [...FRIENDS, ...OTHERS]
 export const friend = (id) => PEOPLE.find((f) => f.id === id)
@@ -48,7 +50,7 @@ const novemberPins = () => [
   { id: 'p2', type: 'ticket', from: 'NYC', to: 'BUD', date: '2026-12-19', dep: '18:40', arr: '08:55', seat: '14A', color: TICKET_COLORS[0], x: 14, y: 232, rot: -3, day: 3, by: 'me' },
   {
     id: 'p3', type: 'photo', art: 'budapest', x: 122, y: 34, rot: 3, day: 8, by: 'alex',
-    comments: [{ by: 'alex', text: 'remember that night walk along the danube? i miss u', meta: 'ALEX · BUDAPEST · 2:14 AM' }],
+    comments: [{ by: 'alex', text: 'remember that night walk along the danube? i miss u', meta: 'CHRISTY · BUDAPEST · 2:14 AM' }],
   },
   { id: 'p4', type: 'voice', dur: 13, x: 108, y: 178, rot: 3, day: 8, by: 'alex' },
   { id: 'p5', type: 'note', text: 'I miss you...', color: NOTE_COLORS[0], x: 128, y: 226, rot: -3, day: 13, by: 'me' },

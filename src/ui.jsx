@@ -246,7 +246,7 @@ export function PinView({ pin, user, onVote }) {
       return (
         <div className="pin-license">
           <span className="lic-photo">{user?.photo ? <img src={user.photo} alt="" draggable={false} /> : <Art kind="portrait" />}</span>
-          <span className="lic-text">LICENSE TO VISIT<br />NO. 7704-11<br />HOLDER: {(user?.name || 'YOU').toUpperCase()}<br />GOOD FOR: ALEX<br />EXP: NEVER</span>
+          <span className="lic-text">LICENSE TO VISIT<br />NO. 7704-11<br />HOLDER: {(user?.name || 'YOU').toUpperCase()}<br />GOOD FOR: {friend('alex').name.toUpperCase()}<br />EXP: NEVER</span>
         </div>
       )
     case 'sticker':
