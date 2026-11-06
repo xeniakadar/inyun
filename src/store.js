@@ -13,14 +13,14 @@ export const TODAY = 30
 // Change `name` and `username` to rename someone; nothing else needs to change.
 // `photo` is a file in public/photos (without .jpg) used as their profile picture; without it they get an initial.
 export const FRIENDS = [
-  { id: 'alex', name: 'Christy', username: 'christy', photo: 'me2', color: '#2f5d62', place: 'Budapest', tz: 'Europe/Budapest', offset: '6 hours ahead', km: 7000 },
+  { id: 'alex', name: 'Christy', username: 'christy', color: '#2f5d62', place: 'Budapest', tz: 'Europe/Budapest', offset: '6 hours ahead', km: 7000 },
   { id: 'josh', name: 'Noah', username: 'noah', color: '#4169d8', place: 'Brooklyn', tz: 'America/New_York', offset: 'same time', km: 0 },
   { id: 'priya', name: 'Ella', username: 'ella', photo: 'me3', color: '#d9ccf5', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
   { id: 'sam', name: 'Sam', username: 'sam', color: '#f3cdb4', light: true, place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
 ]
 // People who are on Inyeon but not on your boards yet. They show up in Find friends.
 export const OTHERS = [
-  { id: 'mina', name: 'Xenia', username: 'xenia', color: '#b9a2ad', light: true, place: 'Seoul', tz: 'Asia/Seoul', offset: '14 hours ahead', km: 11000 },
+  { id: 'mina', name: 'Xenia', username: 'xenia', photo: 'me2', color: '#b9a2ad', light: true, place: 'Seoul', tz: 'Asia/Seoul', offset: '14 hours ahead', km: 11000 },
   { id: 'theo', name: 'Ashley', username: 'ashley', color: '#4f6b58', place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
   { id: 'ines', name: 'Niu-Niu', username: 'niuniu', color: '#dcbb52', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
   { id: 'kai', name: 'Viraj', username: 'viraj', color: '#6f2f35', place: 'Singapore', tz: 'Asia/Singapore', offset: '13 hours ahead', km: 15300 },
@@ -73,6 +73,8 @@ const novemberPins = () => [
   { id: 'p21', type: 'object', name: 'envelope', x: 740, y: 268, rot: -4, day: 22, by: 'alex' },
   { id: 'p22', type: 'time', label: '2:14 AM', x: 838, y: 316, rot: -2, day: 25, by: 'alex' },
   { id: 'p23', type: 'sticker', name: 'moon', x: 962, y: 104, rot: 0, day: 27, by: 'alex' },
+  { id: 'p28', type: 'photo', art: 'cat', x: 904, y: 180, rot: 3, day: 9, by: 'alex',
+    comments: [{ by: 'alex', text: 'she sat on your mug again. she misses you too', meta: 'BUDAPEST · 9:40 AM' }] },
   { id: 'p24', type: 'photo', art: 'friends', x: 1060, y: 36, rot: -3, day: 14, by: 'me',
     comments: [{ by: 'me', text: 'found this from when you were here. come back', meta: 'NEW YORK · 11:20 PM' }] },
   { id: 'p25', type: 'photo', art: 'fun1', x: 1200, y: 70, rot: 4, day: 17, by: 'alex',
@@ -101,7 +103,7 @@ const social = () => ({
     { id: 'n1', who: 'alex', text: 'pinned a photo to your board', boardId: 'alex', when: '12 min ago' },
     { id: 'n2', who: 'alex', text: 'left you a voice note', boardId: 'alex', when: '2 hours ago' },
     { id: 'n3', who: 'priya', text: 'voted Lisbon on "where do we meet up?"', boardId: 'group', when: '5 hours ago' },
-    { id: 'n4', who: 'sam', text: 'added a sticker to your board', boardId: 'group', when: 'Yesterday', read: true },
+    { id: 'n4', who: 'josh', text: 'pinned a photo of his dog', boardId: 'group', when: 'Yesterday', read: true },
     { id: 'n5', who: 'josh', text: 'accepted your friend request', when: 'Yesterday', read: true },
     { id: 'n6', text: 'Your October recap is ready to walk through', boardId: 'alex', recap: true, when: 'Nov 1', read: true },
   ],
@@ -139,6 +141,8 @@ export function seed() {
           { id: 'g6', type: 'strip', x: 300, y: 90, rot: 2, day: 5, by: 'me' },
           { id: 'g7', type: 'photo', art: 'friends3', x: 400, y: 40, rot: -2, day: 5, by: 'sam' },
           { id: 'g8', type: 'photo', art: 'drinks', x: 530, y: 150, rot: 3, day: 5, by: 'josh' },
+          { id: 'g10', type: 'photo', art: 'dog', x: 660, y: 60, rot: -3, day: 5, by: 'josh' },
+          { id: 'g11', type: 'sticker', name: 'heart', x: 790, y: 180, rot: 8, day: 5, by: 'priya' },
           { id: 'g9', type: 'sticker', name: 'laugh', x: 520, y: 70, rot: 0, day: 5, by: 'priya' },
         ],
       },

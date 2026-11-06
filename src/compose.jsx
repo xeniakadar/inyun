@@ -101,7 +101,7 @@ export function NoteComposer({ dispatch, id, back, voiceFirst }) {
   )
 }
 
-const GALLERY = ['friends', 'budapest2', 'sushi', 'flowers', 'nyc', 'drinks', 'friends2', 'fun', 'fun1', 'fun2', 'budapest', 'friends3']
+const GALLERY = ['friends', 'budapest2', 'sushi', 'cat', 'flowers', 'nyc', 'dog', 'drinks', 'friends2', 'fun', 'fun1', 'fun2', 'budapest', 'friends3']
 
 export function PhotoPicker({ dispatch, id, back }) {
   const [sel, setSel] = useState({ art: 'friends' })
