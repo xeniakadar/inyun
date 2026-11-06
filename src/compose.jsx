@@ -1,7 +1,7 @@
 // The four things you can pin: note, voice, photo, sticker.
 import { useEffect, useRef, useState } from 'react'
 import { LIST_DEFAULT, NOTE_COLORS, TICKET_COLORS, TODAY, fileToDataUrl, timeIn, uid } from './store.js'
-import { STICKER_NAMES, Sticker } from './stickers.jsx'
+import { OBJECTS, ObjectSticker, STICKER_NAMES, Sticker } from './stickers.jsx'
 import { Art, Icon, PinView, StatusBar, Wave, clock } from './ui.jsx'
 
 const drop = (extra) => ({
@@ -78,11 +78,14 @@ export function NoteComposer({ dispatch, id, back, voiceFirst }) {
           <button key={c} className={`swatch ${c === color ? 'on' : ''}`} style={{ background: c }} aria-label="Note colour" aria-pressed={c === color} onClick={() => setColor(c)} />
         ))}
       </header>
+      <div className="sticky-wrap">
+        <span className="tack big" aria-hidden="true" />
       <textarea
-        className="sticky hand" style={{ background: color }} value={text} autoFocus={!voiceFirst}
-        placeholder={voiceFirst ? 'Add a note to go with it...' : 'I miss you...'} maxLength={140}
-        onChange={(e) => setText(e.target.value)}
-      />
+          className="sticky paperlines hand" style={{ backgroundColor: color }} value={text} autoFocus={!voiceFirst}
+          placeholder={voiceFirst ? 'Add a note to go with it...' : 'I miss you...'} maxLength={140}
+          onChange={(e) => setText(e.target.value)}
+        />
+      </div>
       {rec.on ? (
         <div className="recrow">
           <div className="recbar"><i className="recdot" /><small>{clock(rec.secs)}</small><Wave active count={17} /></div>
@@ -114,7 +117,7 @@ export function PhotoPicker({ dispatch, id, back }) {
     <div className="screen paper">
       <StatusBar />
       <Header back={back} title="Pick a photo" />
-      <div className="preview"><div className="pin-photo large"><span className="tack" /><Art kind={sel.art} src={sel.src} /></div></div>
+      <div className="preview"><div className="pin-photo large"><Art kind={sel.art} src={sel.src} /></div></div>
       <div className="pad"><button className="btn dark" onClick={() => { dispatch({ type: 'addPin', boardId: id, pin: drop({ type: 'photo', ...sel }) }); back() }}>Pin to board</button></div>
       <div className="gallery">
         {GALLERY.map((g) => (
@@ -146,6 +149,7 @@ export function StickerPicker({ dispatch, id, back, go }) {
       <Header back={back} title="Pick a sticker" />
       <div className="preview dotted"><div className="preview-pin"><PinView pin={sel} /></div></div>
       <div className="pad"><button className="btn dark" onClick={() => { dispatch({ type: 'addPin', boardId: id, pin: drop(sel) }); back() }}>Pin to board</button></div>
+      <div className="scroll grow">
       <div className="extras">
         {extras.map((x) => (
           <button key={x.key} className={`pin-chip ${x.cls || ''}`} onClick={() => { const s = x.make(); if (s) setSel(s) }}>{x.node}</button>
@@ -156,8 +160,14 @@ export function StickerPicker({ dispatch, id, back, go }) {
       </div>
       <div className="stickergrid">
         {STICKER_NAMES.map((s) => (
-          <button key={s} className={`pin-sticker ${sel.name === s ? 'on' : ''}`} onClick={() => setSel({ type: 'sticker', name: s })} aria-label={`${s} sticker`}><Sticker name={s} size={44} /></button>
+          <button key={s} className={`pin-sticker ${sel.type === 'sticker' && sel.name === s ? 'on' : ''}`} onClick={() => setSel({ type: 'sticker', name: s })} aria-label={`${s} sticker`}><Sticker name={s} size={44} /></button>
         ))}
+      </div>
+      <div className="objectgrid">
+        {OBJECTS.map((o) => (
+          <button key={o.name} className={sel.type === 'object' && sel.name === o.name ? 'on' : ''} onClick={() => setSel({ type: 'object', name: o.name })} aria-label={`${o.name.replace('-', ' ')} sticker`}><ObjectSticker name={o.name} width="100%" /></button>
+        ))}
+      </div>
       </div>
     </div>
   )

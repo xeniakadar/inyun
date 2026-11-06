@@ -1,7 +1,7 @@
 // Shared building blocks: icons, avatars, placeholder art, and every kind of pin.
 import { useEffect, useRef, useState } from 'react'
-import { LIST_DEFAULT, TICKET_COLORS, friend } from './store.js'
-import { Sticker } from './stickers.jsx'
+import { LIST_DEFAULT, TICKET_COLORS, friend, noteColor } from './store.js'
+import { ObjectSticker, Sticker } from './stickers.jsx'
 
 const paths = {
   back: <path d="M19 12H5m6-6-6 6 6 6" />,
@@ -204,7 +204,8 @@ const Tack = () => <span className="tack" aria-hidden="true" />
 export function PinView({ pin, user, onVote }) {
   switch (pin.type) {
     case 'note':
-      return <div className="pin-note hand" style={{ background: pin.color }}><Tack />{pin.text}</div>
+      // The pin sits outside the paper so the torn edge (a clip-path) does not cut it off.
+      return <div className="pin-note-wrap"><Tack /><div className="pin-note paperlines hand" style={{ backgroundColor: noteColor(pin.color) }}>{pin.text}</div></div>
     case 'lined':
       return (
         <div className="pin-lined">
@@ -214,7 +215,7 @@ export function PinView({ pin, user, onVote }) {
         </div>
       )
     case 'photo':
-      return <div className="pin-photo"><Tack /><Art kind={pin.art} src={pin.src} /></div>
+      return <div className="pin-photo"><Art kind={pin.art} src={pin.src} /></div>
     case 'voice':
       return <Voice pin={pin} />
     case 'ticket':
@@ -249,6 +250,8 @@ export function PinView({ pin, user, onVote }) {
       )
     case 'sticker':
       return <div className="pin-sticker"><Sticker name={pin.name} emoji={pin.emoji} /></div>
+    case 'object':
+      return <div className="pin-object"><ObjectSticker name={pin.name} /></div>
     case 'countdown':
       return <div className="pin-countdown"><span>{pin.label}</span><b>{pin.n}</b></div>
     case 'place':

@@ -35,7 +35,10 @@ export const LIST_DEFAULT = {
 }
 
 export const TICKET_COLORS = ['#3f66d6', '#6f2f35', '#4f6b58', '#dcbb52', '#b9a2ad', '#1f2128']
-export const NOTE_COLORS = ['#fdf8c9', '#f6d9c4', '#d9ead9', '#d6e3fb', '#e2d9f7']
+export const NOTE_COLORS = ['#e3d9a9', '#e8cfba', '#cfdccb', '#c9d6e2', '#d9c9d6']
+// Notes saved with the earlier, brighter colours show in the matching new one.
+const OLD_NOTE_COLORS = { '#fdf8c9': 0, '#f6d9c4': 1, '#d9ead9': 2, '#d6e3fb': 3, '#e2d9f7': 4 }
+export const noteColor = (c) => (c in OLD_NOTE_COLORS ? NOTE_COLORS[OLD_NOTE_COLORS[c]] : c || NOTE_COLORS[0])
 
 let n = 0
 export const uid = () => `${Date.now().toString(36)}${(n++).toString(36)}`

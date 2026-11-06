@@ -208,8 +208,14 @@ img { display: block; }
 .m3 { left: 83%; bottom: 52px; }
 
 /* pins */
-.tack { position: absolute; top: -5px; left: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #7d9bf0, var(--blue) 60%, #2b47a0); box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3); z-index: 2; }
-.pin-note { width: 106px; min-height: 100px; padding: 16px 10px 10px; font-size: 9.500px; line-height: 1.9; box-shadow: 0 3px 8px rgba(60, 50, 10, 0.16); position: relative; word-break: break-word; }
+.tack { position: absolute; top: -7px; left: 50%; width: 13px; height: 13px; margin-left: -6.500px; z-index: 3; }
+.tack::before { content: ''; position: absolute; left: 12%; right: 12%; bottom: -22%; height: 34%; border-radius: 50%; background: rgba(30, 34, 30, 0.75); }
+.tack::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 36% 30%, #fff 0 9%, #8fa698 16%, #5f7a69 55%, #3c5246 100%); }
+.tack.big { width: 26px; height: 26px; margin-left: -13px; top: -6px; }
+.pin-note-wrap { position: relative; filter: drop-shadow(0 3px 5px rgba(60, 50, 10, 0.2)); }
+.pin-note { width: 106px; min-height: 100px; padding: 18px 10px 10px; font-size: 9.500px; line-height: 18px; word-break: break-word; clip-path: polygon(0% 3px, 4% 1px, 8% 3.5px, 12% 1.5px, 17% 3px, 22% 0.5px, 27% 2.5px, 33% 1px, 38% 3.2px, 44% 1.5px, 50% 3px, 56% 0.8px, 62% 2.8px, 68% 1.2px, 74% 3.4px, 80% 1px, 86% 2.6px, 92% 0.6px, 96% 2.4px, 100% 1px, 100% 100%, 0 100%); background-size: 100% 100%, 100% 9px; background-position: 0 0, 0 5px; }
+/* ruled, slightly creased paper: a soft crease highlight over evenly spaced rules */
+.paperlines { background-image: linear-gradient(112deg, rgba(255, 255, 255, 0.2) 0 16%, transparent 32% 52%, rgba(70, 55, 10, 0.05) 66%, transparent 84%), repeating-linear-gradient(to bottom, transparent 0 calc(100% - 1px), rgba(95, 80, 30, 0.07) calc(100% - 1px) 100%); }
 .pin-lined { width: 96px; padding: 6px 9px 12px; background: #fdf3b4; background-image: repeating-linear-gradient(transparent 0 15px, #e8d98a 15px 16px); background-position: 0 30px; box-shadow: 0 3px 8px rgba(60, 50, 10, 0.16); font-size: 10.500px; line-height: 16px; }
 .pin-lined small { display: block; text-align: right; font-size: 6px; color: var(--blue); line-height: 10px; }
 .pin-lined b { color: var(--blue); font-size: 14px; display: block; line-height: 20px; }
@@ -253,7 +259,8 @@ img { display: block; }
 .swatches { gap: 14px; }
 .swatch { width: 26px; height: 26px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); }
 .swatch.on { box-shadow: 0 0 0 3px var(--paper), 0 0 0 4.500px var(--ink); }
-.sticky { margin: 10px 20px 0; height: 290px; border: 0; resize: none; padding: 34px 22px; font-size: 15px; line-height: 2; box-shadow: 0 6px 16px rgba(60, 50, 10, 0.16); flex: none; outline: none; }
+.sticky-wrap { position: relative; margin: 14px 20px 0; flex: none; filter: drop-shadow(0 6px 10px rgba(60, 50, 10, 0.2)); }
+.sticky { display: block; width: 100%; height: 290px; border: 0; resize: none; padding: 40px 22px 20px; font-size: 15px; line-height: 30px; outline: none; clip-path: polygon(0% 7.8px, 4% 2.6px, 8% 9.1px, 12% 3.9px, 17% 7.8px, 22% 1.3px, 27% 6.5px, 33% 2.6px, 38% 8.3px, 44% 3.9px, 50% 7.8px, 56% 2.1px, 62% 7.3px, 68% 3.1px, 74% 8.8px, 80% 2.6px, 86% 6.8px, 92% 1.6px, 96% 6.2px, 100% 2.6px, 100% 100%, 0 100%); background-size: 100% 100%, 100% 30px; background-position: 0 0, 0 14px; background-attachment: scroll, local; }
 .recrow { display: flex; gap: 10px; padding: 16px 20px; align-items: center; }
 .recbar { flex: 1; height: 46px; border-radius: 23px; background: #fff; box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; padding: 0 16px; overflow: hidden; }
 .recbar small { font-size: 12px; font-variant-numeric: tabular-nums; }
@@ -262,14 +269,14 @@ img { display: block; }
 @keyframes blink { to { opacity: 0.3; } }
 .stopbtn { width: 50px; height: 50px; border-radius: 50%; background: var(--orange); color: #fff; display: grid; place-items: center; flex: none; }
 .preview { height: 290px; display: grid; place-items: center; flex: none; }
-.preview.dotted { margin: 6px 20px 16px; height: 270px; border-radius: 22px; background-color: #f4f4f0; background-image: radial-gradient(#e2e2dc 1px, transparent 1px); background-size: 7px 7px; }
+.preview.dotted { margin: 6px 20px 16px; height: 230px; border-radius: 22px; background-color: #f4f4f0; background-image: radial-gradient(#e2e2dc 1px, transparent 1px); background-size: 7px 7px; }
 .preview-pin { transform: scale(1.7) rotate(3deg); }
 .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 18px 20px; overflow-y: auto; }
 .gallery button { height: 78px; border-radius: 4px; overflow: hidden; }
 .gallery button.on { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink); }
 .gallery .upload { border: 1.200px dashed var(--ink); color: var(--ink); }
 .extras { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px 6px; }
-.stickergrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px 6px; padding: 14px 20px; justify-items: center; overflow-y: auto; }
+.stickergrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px 6px; padding: 14px 20px; justify-items: center; }
 .stickergrid .pin-sticker.on { transform: scale(1.2); }
 
 /* pin detail */
@@ -364,3 +371,11 @@ img { display: block; }
 .notif > .dot { margin-top: 6px; }
 .whoami { display: grid; justify-items: center; margin: -6px 0; }
 .whoami small { color: var(--muted); }
+
+/* photo cut-out stickers */
+.pin-object { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.22)); display: grid; }
+.object-img { height: auto; display: block; max-width: none; }
+.objectgrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px 10px; padding: 8px 20px 24px; align-items: center; }
+.objectgrid button { height: 58px; display: grid; place-items: center; border-radius: 10px; padding: 4px; }
+.objectgrid button.on { background: #efecd6; }
+.objectgrid .object-img { max-width: 100%; max-height: 50px; width: auto !important; object-fit: contain; }

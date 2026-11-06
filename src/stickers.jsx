@@ -91,3 +91,17 @@ export function Sticker({ name, emoji, size = 40 }) {
   if (!ART[key]) return <span style={{ fontSize: size * 0.8 }}>{emoji}</span>
   return <svg width={size} height={size} viewBox="0 0 48 48" role="img" aria-label={`${key} sticker`}>{ART[key]}</svg>
 }
+
+// Photo cut-outs from the design system: files in public/stickers/<name>.png, with the width each shows at on a board.
+// To add one, save a transparent PNG there and add a line here.
+export const OBJECTS = [
+  { name: 'camera', w: 64 }, { name: 'tumbler', w: 50 }, { name: 'envelope', w: 62 }, { name: 'star', w: 30 },
+  { name: 'stub', w: 66 }, { name: 'clip-blue', w: 78 }, { name: 'clip-silver', w: 70 }, { name: 'tape-green', w: 76 },
+  { name: 'tape-gingham', w: 130 }, { name: 'tape-clear', w: 90 }, { name: 'clip-paper', w: 70 }, { name: 'lined-paper', w: 84 },
+  { name: 'paper', w: 96 }, { name: 'clipboard', w: 96 }, { name: 'crumpled', w: 96 },
+]
+
+export function ObjectSticker({ name, width }) {
+  const o = OBJECTS.find((x) => x.name === name)
+  return <img className="object-img" src={`${import.meta.env.BASE_URL}stickers/${name}.png`} alt={`${name.replace('-', ' ')} sticker`} draggable={false} style={{ width: width || o?.w || 70 }} />
+}
