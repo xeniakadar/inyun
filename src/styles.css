@@ -25,7 +25,8 @@ img { display: block; }
 .phone { width: 390px; height: min(844px, 100dvh); border-radius: 44px; overflow: hidden; position: relative; background: var(--paper); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); animation: fade 0.25s ease; }
 @media (max-width: 480px) { .phone { width: 100vw; height: 100dvh; border-radius: 0; box-shadow: none; } }
 @keyframes fade { from { opacity: 0.4; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition: none !important; } }
+/* Motion plays for everyone, including devices set to "reduce motion": this is a demo and the movement is the point.
+   For a real release, restore: @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; transition: none !important; } } */
 
 .screen { height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 .paper { background: var(--paper); }
@@ -387,3 +388,29 @@ img { display: block; }
 .withx { display: flex; gap: 8px; align-items: center; }
 .withx input { flex: 1; }
 .ticketfields .person.wide { height: 48px; }
+
+/* animated opening screen */
+.grad-live { background-color: #f6ddb6; }
+.grad > .aurora { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+/* Each blob wanders a triangle (start -> far corner -> opposite side -> back) and swells as it goes.
+   --dx/--dy: how far it travels. --s: how big it gets. animation-duration: one full lap. */
+.aurora i { position: absolute; border-radius: 50%; will-change: transform; animation: drift 8s ease-in-out infinite; }
+.aurora .b1 { left: -30%; top: -14%; width: 100%; aspect-ratio: 1; background: radial-gradient(circle, var(--c) 0, transparent 68%); --dx: 190px; --dy: 220px; --s: 1.5; animation-duration: 9s; }
+.aurora .b2 { right: -32%; top: -12%; width: 96%; aspect-ratio: 1; background: radial-gradient(circle, var(--c) 0, transparent 68%); --dx: -200px; --dy: 180px; --s: 1.4; animation-duration: 11s; }
+.aurora .b3 { left: 4%; top: 24%; width: 104%; aspect-ratio: 1; background: radial-gradient(circle, var(--c) 0, transparent 66%); --dx: -130px; --dy: -190px; --s: 1.55; animation-duration: 7s; }
+.aurora .b4 { left: -36%; top: 54%; width: 104%; aspect-ratio: 1; background: radial-gradient(circle, var(--c) 0, transparent 68%); --dx: 220px; --dy: -160px; --s: 1.45; animation-duration: 10s; }
+.aurora .b5 { right: -28%; top: 44%; width: 90%; aspect-ratio: 1; background: radial-gradient(circle, var(--c) 0, transparent 68%); --dx: -180px; --dy: 200px; --s: 1.5; animation-duration: 8s; }
+.aurora .b6 { right: -32%; bottom: -20%; width: 94%; aspect-ratio: 1; background: radial-gradient(circle, var(--c) 0, transparent 68%); --dx: -210px; --dy: -230px; --s: 1.45; animation-duration: 12s; }
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  35% { transform: translate(var(--dx), var(--dy)) scale(var(--s)); }
+  70% { transform: translate(calc(var(--dx) * -0.45), calc(var(--dy) * 0.55)) scale(0.85); }
+}
+.grad-live .logo { animation: rise 1.2s ease both; }
+.grad-live .splash-mid p { animation: rise 1.2s 0.25s ease both; }
+.grad-live .foot { animation: rise 1.2s 0.5s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* the same moving background on every onboarding screen: the still gradient is switched off and the blobs take over */
+.grad.live { background-image: none; }
+.grad > .aurora-fade { position: absolute; inset: 0; z-index: 0; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 110px, #fff 350px); }

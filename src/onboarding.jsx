@@ -5,6 +5,28 @@ import { Art, Avatar, Icon, StatusBar } from './ui.jsx'
 
 const STEPS = 7
 
+// The moving background: six soft blobs in the given colours, drifting behind everything else on the screen.
+// `fade` adds the wash to white used on the form screens, so the fields sit on a plain background.
+const PALETTES = {
+  splash: ['#a892f5', '#f284b6', '#ee962f', '#f392bf', '#f9cc50', '#94b6f7'],
+  peach: ['#f2a0c0', '#f3a583', '#f7c49e', '#ee96b2', '#f8d4a4', '#ecaad2'],
+  sea: ['#b3a6f0', '#93c9ee', '#9cdcbc', '#84bde8', '#c4baf4', '#a6e2c8'],
+  lilac: ['#ba96ee', '#e4aaee', '#afa0f2', '#d4b8f6', '#f0bade', '#aea8f0'],
+  sun: ['#f6c250', '#f39e5c', '#c8dc84', '#f8d470', '#f0ac78', '#dae494'],
+  setup: ['#a892f5', '#f08fba', '#f6cf90', '#c2aef6', '#f4a0c4', '#f8dca4'],
+  purpose: ['#9fc8e8', '#b8a8f3', '#aedcd8', '#94baec', '#cabdf6', '#b6e0ee'],
+  invite: ['#f3b294', '#f092ba', '#f8ca9c', '#f29eae', '#f6bcd0', '#f8d6ac'],
+  allset: ['#cfe070', '#f4eca0', '#bcdb9c', '#e2ea88', '#f6eeb8', '#c8e2a8'],
+}
+function Aurora({ palette, fade }) {
+  return (
+    <>
+      <div className="aurora" aria-hidden="true">{PALETTES[palette].map((c, n) => <i key={n} className={`b${n + 1}`} style={{ '--c': c }} />)}</div>
+      {fade && <div className="aurora-fade" aria-hidden="true" />}
+    </>
+  )
+}
+
 function Dots({ step }) {
   return (
     <div className="dots" aria-label={`Step ${step + 1} of ${STEPS}`}>
@@ -25,7 +47,8 @@ function TopBar({ step, onBack, onSkip }) {
 
 export function Splash({ onStart, onHave }) {
   return (
-    <div className="screen grad grad-splash">
+    <div className="screen grad grad-live live">
+      <Aurora palette="splash" />
       <StatusBar />
       <div className="splash-mid">
         <h1 className="serif logo">Inyun</h1>
@@ -41,7 +64,7 @@ export function Splash({ onStart, onHave }) {
 
 const SLIDES = [
   {
-    grad: 'grad-peach', eyebrow: 'For the people far away', title: 'Stay close to your long distance besties.',
+    grad: 'grad-peach', palette: 'peach', eyebrow: 'For the people far away', title: 'Stay close to your long distance besties.',
     body: 'Leave notes, voice notes and photos on a shared board, whatever time it is where they are.',
     art: () => (
       <div className="ill ill-besties">
@@ -52,7 +75,7 @@ const SLIDES = [
     ),
   },
   {
-    grad: 'grad-sea', eyebrow: 'For the group chat', title: 'Plan the trip before you land.',
+    grad: 'grad-sea', palette: 'sea', eyebrow: 'For the group chat', title: 'Plan the trip before you land.',
     body: 'Pin restaurants, tickets and links in one place with your friends, then keep it all when you get home.',
     art: () => (
       <div className="ill ill-trip">
@@ -66,7 +89,7 @@ const SLIDES = [
     ),
   },
   {
-    grad: 'grad-lilac', eyebrow: 'For just you', title: 'Keep a journal worth looking at.',
+    grad: 'grad-lilac', palette: 'lilac', eyebrow: 'For just you', title: 'Keep a journal worth looking at.',
     body: 'A visual diary, a vision board, or a place to track the months. Your own board, kept for you.',
     art: () => (
       <div className="ill ill-journal">
@@ -77,7 +100,7 @@ const SLIDES = [
     ),
   },
   {
-    grad: 'grad-sun', eyebrow: 'Every month', title: 'Then walk back through it together.',
+    grad: 'grad-sun', palette: 'sun', eyebrow: 'Every month', title: 'Then walk back through it together.',
     body: 'At the end of each month, your board becomes a recap of how far you came, and who came with you.',
     cta: 'Set up my board',
     art: () => (
@@ -93,7 +116,8 @@ const SLIDES = [
 export function Intro({ index, onNext, onBack, onSkip }) {
   const s = SLIDES[index]
   return (
-    <div className={`screen grad ${s.grad}`}>
+    <div className={`screen grad live ${s.grad}`}>
+      <Aurora palette={s.palette} />
       <StatusBar />
       <TopBar step={index} onBack={index > 0 ? onBack : null} onSkip={onSkip} />
       {s.art()}
@@ -116,7 +140,8 @@ export function Setup({ user, dispatch, onNext, onBack }) {
     if (f) dispatch({ type: 'user', patch: { photo: await fileToDataUrl(f, 500) } })
   }
   return (
-    <div className="screen grad grad-setup">
+    <div className="screen grad live grad-setup">
+      <Aurora palette="setup" fade />
       <StatusBar />
       <TopBar step={4} onBack={onBack} />
       <div className="ob-head">
@@ -164,7 +189,8 @@ export function Purpose({ state, dispatch, onNext, onBack }) {
     dispatch({ type: 'set', patch: { purposes: has ? state.purposes.filter((x) => x !== p) : [...state.purposes, p] } })
   }
   return (
-    <div className="screen grad grad-purpose">
+    <div className="screen grad live grad-purpose">
+      <Aurora palette="purpose" fade />
       <StatusBar />
       <TopBar step={5} onBack={onBack} />
       <div className="ob-head">
@@ -188,7 +214,8 @@ export function Invite({ state, dispatch, onNext, onBack }) {
     dispatch({ type: 'set', patch: { invited: has ? state.invited.filter((x) => x !== id) : [...state.invited, id] } })
   }
   return (
-    <div className="screen grad grad-invite">
+    <div className="screen grad live grad-invite">
+      <Aurora palette="invite" fade />
       <StatusBar />
       <TopBar step={6} onBack={onBack} />
       <div className="ob-head">
@@ -215,7 +242,8 @@ export function Invite({ state, dispatch, onNext, onBack }) {
 
 export function AllSet({ onOpen }) {
   return (
-    <div className="screen grad grad-allset">
+    <div className="screen grad live grad-allset">
+      <Aurora palette="allset" />
       <StatusBar />
       <div className="splash-mid">
         <h2 className="serif big">You're all set.</h2>
