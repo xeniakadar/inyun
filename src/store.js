@@ -16,11 +16,11 @@ export const FRIENDS = [
   { id: 'alex', name: 'Christy', username: 'christy', color: '#2f5d62', place: 'Budapest', tz: 'Europe/Budapest', offset: '6 hours ahead', km: 7000 },
   { id: 'josh', name: 'Noah', username: 'noah', color: '#4169d8', place: 'Brooklyn', tz: 'America/New_York', offset: 'same time', km: 0 },
   { id: 'priya', name: 'Ella', username: 'ella', photo: 'me3', color: '#d9ccf5', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
+  { id: 'mina', name: 'Xenia', username: 'xenia', photo: 'me2', color: '#b9a2ad', light: true, place: 'Budapest', tz: 'Europe/Budapest', offset: '6 hours ahead', km: 7000 },
   { id: 'sam', name: 'Sam', username: 'sam', color: '#f3cdb4', light: true, place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
 ]
 // People who are on Inyeon but not on your boards yet. They show up in Find friends.
 export const OTHERS = [
-  { id: 'mina', name: 'Xenia', username: 'xenia', photo: 'me2', color: '#b9a2ad', light: true, place: 'Seoul', tz: 'Asia/Seoul', offset: '14 hours ahead', km: 11000 },
   { id: 'theo', name: 'Ashley', username: 'ashley', color: '#4f6b58', place: 'London', tz: 'Europe/London', offset: '5 hours ahead', km: 5600 },
   { id: 'ines', name: 'Niu-Niu', username: 'niuniu', color: '#dcbb52', light: true, place: 'Lisbon', tz: 'Europe/Lisbon', offset: '5 hours ahead', km: 5400 },
   { id: 'kai', name: 'Viraj', username: 'viraj', color: '#6f2f35', place: 'Singapore', tz: 'Asia/Singapore', offset: '13 hours ahead', km: 15300 },
@@ -99,7 +99,7 @@ const octoberPins = () => [
 // Friends, requests and notifications. Kept separate so boards saved before these existed still load.
 const social = () => ({
   friends: FRIENDS.map((f) => f.id),
-  requests: ['mina'], // people asking to be your friend
+  requests: ['theo'], // people asking to be your friend
   sent: [], // people you have asked
   requestsSeen: false,
   notifs: [
