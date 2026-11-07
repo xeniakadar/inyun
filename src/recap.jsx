@@ -173,7 +173,7 @@ export function RecapPlayer({ state, id, month, back }) {
           <span className="datesticker-fixed"><DateSticker month={month} day={day} tint /></span>
           <div className="recap-collage" style={{ zoom: ZOOM, width: Math.round(390 / ZOOM), transform: `translateY(-${drift}px)` }}>
             {shown.map((p) => (
-              <span key={p.id} className="recap-pin" style={{ left: p.cx, top: p.cy, transform: `rotate(${p.crot}deg)` }}><PinView pin={p} user={user} /></span>
+              <span key={p.id} className="recap-pin" style={{ left: p.cx, top: p.cy, transform: `rotate(${p.crot}deg) scale(${p.scale || 1})` }}><PinView pin={p} user={user} /></span>
             ))}
           </div>
         </div>
