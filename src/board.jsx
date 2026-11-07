@@ -263,17 +263,22 @@ export function PinDetail({ state, dispatch, id, pinId, go, back }) {
         <button className="round overlay" onClick={back} aria-label="Back"><Icon name="back" size={18} /></button>
       </div>
       <div className="detail-notes scroll">
-        <span className="caps">NOTES</span>
-        {(pin.comments || []).map((c, i) => (
-          <div className="comment" key={i}>
-            <Avatar who={c.by} user={user} size={26} />
-            <div><p>{c.text}</p><span className="caps">{c.meta}</span></div>
-          </div>
-        ))}
-        <form onSubmit={send}>
-          <input className="writeback serif" value={text} placeholder="Write back..." onChange={(e) => setText(e.target.value)} />
-        </form>
-        <hr /><hr />
+        {/* a board that is just yours has nobody to write back to, so no notes section: just the pin and its actions */}
+        {board.members.length > 0 && (
+          <>
+            <span className="caps">NOTES</span>
+            {(pin.comments || []).map((c, i) => (
+              <div className="comment" key={i}>
+                <Avatar who={c.by} user={user} size={26} />
+                <div><p>{c.text}</p><span className="caps">{c.meta}</span></div>
+              </div>
+            ))}
+            <form onSubmit={send}>
+              <input className="writeback serif" value={text} placeholder="Write back..." onChange={(e) => setText(e.target.value)} />
+            </form>
+            <hr /><hr />
+          </>
+        )}
         {pin.by === 'me' && pin.type === 'receipt' && (
           <button className="pill float edit" onClick={() => go('list', { id, pinId })}>Edit list</button>
         )}
