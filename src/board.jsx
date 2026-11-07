@@ -198,26 +198,23 @@ function DraggablePin({ pin, user, editing, onEdit, onMove, onOpen, onRemove, on
     setPos(null)
   }
 
-  // mouse fallback: small grips for resize and rotate, shown only on devices without touch
+  // mouse fallback: one corner grip does both, shown only on devices without touch.
+  // Dragging it away from or toward the pin's centre resizes; dragging it around the centre rotates.
   const grip = useRef(null)
   const gripDown = (kind) => (e) => {
     e.stopPropagation()
     const r = e.currentTarget.parentElement.getBoundingClientRect()
     const cx = r.left + r.width / 2, cy = r.top + r.height / 2
-    grip.current = { kind, px: e.clientX, py: e.clientY, w: r.width, h: r.height, cx, cy, a0: Math.atan2(e.clientY - cy, e.clientX - cx), s0: pin.scale || 1, r0: pin.rot }
+    grip.current = { kind, cx, cy, d0: Math.hypot(e.clientX - cx, e.clientY - cy), a0: Math.atan2(e.clientY - cy, e.clientX - cx), s0: pin.scale || 1, r0: pin.rot }
     e.currentTarget.setPointerCapture(e.pointerId)
   }
   const gripMove = (e) => {
     const g = grip.current
     if (!g) return
-    if (g.kind === 'size') {
-      const grow = ((e.clientX - g.px) + (e.clientY - g.py)) / ((g.w + g.h) / 2)
-      setLive({ scale: Math.max(MIN_SCALE, Math.min(MAX_SCALE, g.s0 * (1 + grow))), rot: pin.rot })
-    } else {
-      let rot = g.r0 + ((Math.atan2(e.clientY - g.cy, e.clientX - g.cx) - g.a0) * 180) / Math.PI
-      rot = ((rot + 180) % 360 + 360) % 360 - 180
-      setLive({ scale: pin.scale || 1, rot: Math.abs(rot) < 3 ? 0 : rot })
-    }
+    const d = Math.hypot(e.clientX - g.cx, e.clientY - g.cy)
+    let rot = g.r0 + ((Math.atan2(e.clientY - g.cy, e.clientX - g.cx) - g.a0) * 180) / Math.PI
+    rot = ((rot + 180) % 360 + 360) % 360 - 180
+    setLive({ scale: Math.max(MIN_SCALE, Math.min(MAX_SCALE, g.s0 * (d / g.d0))), rot: Math.abs(rot) < 3 ? 0 : rot })
   }
   const gripUp = (e) => {
     e.stopPropagation()
@@ -237,8 +234,7 @@ function DraggablePin({ pin, user, editing, onEdit, onMove, onOpen, onRemove, on
     >
       {editing && <button className="pin-x" style={inv} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onRemove() }} aria-label="Remove from board"><Icon name="x" size={11} stroke={2.4} /></button>}
       <PinView pin={pin} user={user} onVote={editing ? undefined : onVote} />
-      {editing && !hasTouch && <span className="pin-grip turn" style={inv} onPointerDown={gripDown('turn')} onPointerMove={gripMove} onPointerUp={gripUp} onPointerCancel={gripUp} aria-label="Rotate" role="button"><Icon name="rotate" size={12} stroke={2.2} /></span>}
-      {editing && !hasTouch && <span className="pin-grip" style={inv} onPointerDown={gripDown('size')} onPointerMove={gripMove} onPointerUp={gripUp} onPointerCancel={gripUp} aria-label="Resize" role="button"><Icon name="resize" size={12} stroke={2.2} /></span>}
+      {editing && !hasTouch && <span className="pin-grip" style={inv} onPointerDown={gripDown('both')} onPointerMove={gripMove} onPointerUp={gripUp} onPointerCancel={gripUp} aria-label="Resize and rotate" role="button" title="Drag out to resize, around to turn"><Icon name="rotate" size={12} stroke={2.2} /></span>}
     </div>
   )
 }
@@ -330,7 +326,7 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
         </div>
       </div>
       <div className={`hintrow ${menu ? 'blurred' : ''}`}>
-        <span className="caps">{editing ? (hasTouch ? 'DRAG · PINCH TO RESIZE · TWIST TO TURN' : 'DRAG · CORNERS RESIZE AND TURN · × REMOVES') : pins.length ? 'TAP TO OPEN · HOLD TO EDIT' : 'PRESS + TO PIN SOMETHING'}</span>
+        <span className="caps">{editing ? (hasTouch ? 'DRAG · PINCH TO RESIZE · TWIST TO TURN' : 'DRAG · CORNER: OUT TO RESIZE, AROUND TO TURN') : pins.length ? 'TAP TO OPEN · HOLD TO EDIT' : 'PRESS + TO PIN SOMETHING'}</span>
         {newMonth
           ? <button className="pill float honey" onClick={() => go('recaps', { id })}>Your {MONTH} recap <Icon name="arrow" size={12} stroke={2} /></button>
           : <button className="pill float honey" onClick={() => go('recaps', { id })}><Icon name="arrow" size={12} stroke={2} /> Recaps</button>}
