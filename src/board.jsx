@@ -120,58 +120,31 @@ const HOLD_MS = 450
 // A pin on the board. In view mode a tap opens it and any swipe scrolls the board. Holding it for a moment
 // switches the board to edit mode with this pin already lifted; in edit mode pins drag and carry a × to remove them.
 const MIN_SCALE = 0.6, MAX_SCALE = 2.2
+const hasTouch = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches
 
-function DraggablePin({ pin, user, editing, onEdit, onMove, onOpen, onRemove, onResize, onRotate, onVote }) {
+// A pin on the board. View mode: a tap opens it and any swipe scrolls the board. Holding it for a moment switches
+// the board to edit mode with this pin already lifted. Edit mode, like Instagram stories: one finger drags, two fingers
+// pinch to resize and twist to rotate, and a × removes. On a mouse (no pinch) two small grips stand in for the gestures.
+function DraggablePin({ pin, user, editing, onEdit, onMove, onOpen, onRemove, onChange, onVote }) {
   const [pos, setPos] = useState(null)
-  const [size, setSize] = useState(null) // scale while the corner grip is being dragged
-  const [spin, setSpin] = useState(null) // angle while the rotate grip is being dragged
-  const turn = useRef(null)
-  const turnDown = (e) => {
-    e.stopPropagation()
-    const r = e.currentTarget.parentElement.getBoundingClientRect()
-    const cx = r.left + r.width / 2, cy = r.top + r.height / 2
-    turn.current = { cx, cy, a0: Math.atan2(e.clientY - cy, e.clientX - cx), r0: pin.rot }
-    e.currentTarget.setPointerCapture(e.pointerId)
-  }
-  const turnMove = (e) => {
-    const t = turn.current
-    if (!t) return
-    const a = Math.atan2(e.clientY - t.cy, e.clientX - t.cx)
-    let deg = t.r0 + ((a - t.a0) * 180) / Math.PI
-    deg = ((deg + 180) % 360 + 360) % 360 - 180 // keep within -180..180
-    setSpin(Math.abs(deg) < 3 ? 0 : deg) // snaps to straight when close
-  }
-  const turnUp = (e) => {
-    e.stopPropagation()
-    if (turn.current && spin !== null) onRotate(Math.round(spin))
-    turn.current = null
-    setSpin(null)
-  }
-  const grip = useRef(null)
-  const gripDown = (e) => {
-    e.stopPropagation()
-    const rect = e.currentTarget.parentElement.getBoundingClientRect()
-    grip.current = { px: e.clientX, py: e.clientY, w: rect.width, h: rect.height, s: pin.scale || 1 }
-    e.currentTarget.setPointerCapture(e.pointerId)
-  }
-  const gripMove = (e) => {
-    const g = grip.current
-    if (!g) return
-    // how much the diagonal grew, relative to the pin's size when the drag began
-    const grow = ((e.clientX - g.px) + (e.clientY - g.py)) / ((g.w + g.h) / 2)
-    setSize(Math.max(MIN_SCALE, Math.min(MAX_SCALE, g.s * (1 + grow))))
-  }
-  const gripUp = (e) => {
-    e.stopPropagation()
-    if (grip.current && size) onResize(Math.round(size * 20) / 20)
-    grip.current = null
-    setSize(null)
-  }
+  const [live, setLive] = useState(null) // { scale, rot } while two fingers are on the pin
   const start = useRef(null)
   const hold = useRef(null)
+  const touches = useRef(new Map()) // pointerId -> {x, y}
+  const pinch = useRef(null)
   const cancelHold = () => { clearTimeout(hold.current); hold.current = null }
   const lift = (e, s) => { setPos({ x: s.x, y: s.y }); try { e.currentTarget.setPointerCapture(e.pointerId) } catch {} }
+
   const down = (e) => {
+    touches.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (touches.current.size === 2 && editing) {
+      // second finger: start a pinch/twist from the current gap and angle between the fingers
+      const [p1, p2] = [...touches.current.values()]
+      pinch.current = { d0: Math.hypot(p2.x - p1.x, p2.y - p1.y), a0: Math.atan2(p2.y - p1.y, p2.x - p1.x), s0: pin.scale || 1, r0: pin.rot }
+      try { e.currentTarget.setPointerCapture(e.pointerId) } catch {}
+      cancelHold(); start.current = null; setPos(null)
+      return
+    }
     const s = { px: e.clientX, py: e.clientY, x: pin.x, y: pin.y, moved: false, lifted: editing, target: e.currentTarget, pointerId: e.pointerId }
     start.current = s
     if (editing) { lift(e, s); return }
@@ -185,6 +158,17 @@ function DraggablePin({ pin, user, editing, onEdit, onMove, onOpen, onRemove, on
     }, HOLD_MS)
   }
   const move = (e) => {
+    if (touches.current.has(e.pointerId)) touches.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    const pz = pinch.current
+    if (pz && touches.current.size >= 2) {
+      const [p1, p2] = [...touches.current.values()]
+      const d = Math.hypot(p2.x - p1.x, p2.y - p1.y), a = Math.atan2(p2.y - p1.y, p2.x - p1.x)
+      let rot = pz.r0 + ((a - pz.a0) * 180) / Math.PI
+      rot = ((rot + 180) % 360 + 360) % 360 - 180
+      if (Math.abs(rot) < 3) rot = 0 // snaps to straight
+      setLive({ scale: Math.max(MIN_SCALE, Math.min(MAX_SCALE, pz.s0 * (d / pz.d0))), rot })
+      return
+    }
     const s = start.current
     if (!s) return
     const dx = (e.clientX - s.px) / BOARD_ZOOM, dy = (e.clientY - s.py) / BOARD_ZOOM
@@ -196,7 +180,15 @@ function DraggablePin({ pin, user, editing, onEdit, onMove, onOpen, onRemove, on
     s.moved = true
     setPos({ x: Math.max(-10, Math.min(1290, s.x + dx)), y: Math.max(0, Math.min(400, s.y + dy)) })
   }
-  const up = () => {
+  const up = (e) => {
+    touches.current.delete(e.pointerId)
+    if (pinch.current) {
+      if (touches.current.size < 2) {
+        if (live) onChange({ scale: Math.round(live.scale * 20) / 20, rot: Math.round(live.rot) })
+        pinch.current = null; setLive(null); touches.current.clear()
+      }
+      return
+    }
     cancelHold()
     const s = start.current
     start.current = null
@@ -205,17 +197,48 @@ function DraggablePin({ pin, user, editing, onEdit, onMove, onOpen, onRemove, on
     else onOpen()
     setPos(null)
   }
+
+  // mouse fallback: small grips for resize and rotate, shown only on devices without touch
+  const grip = useRef(null)
+  const gripDown = (kind) => (e) => {
+    e.stopPropagation()
+    const r = e.currentTarget.parentElement.getBoundingClientRect()
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2
+    grip.current = { kind, px: e.clientX, py: e.clientY, w: r.width, h: r.height, cx, cy, a0: Math.atan2(e.clientY - cy, e.clientX - cx), s0: pin.scale || 1, r0: pin.rot }
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+  const gripMove = (e) => {
+    const g = grip.current
+    if (!g) return
+    if (g.kind === 'size') {
+      const grow = ((e.clientX - g.px) + (e.clientY - g.py)) / ((g.w + g.h) / 2)
+      setLive({ scale: Math.max(MIN_SCALE, Math.min(MAX_SCALE, g.s0 * (1 + grow))), rot: pin.rot })
+    } else {
+      let rot = g.r0 + ((Math.atan2(e.clientY - g.cy, e.clientX - g.cx) - g.a0) * 180) / Math.PI
+      rot = ((rot + 180) % 360 + 360) % 360 - 180
+      setLive({ scale: pin.scale || 1, rot: Math.abs(rot) < 3 ? 0 : rot })
+    }
+  }
+  const gripUp = (e) => {
+    e.stopPropagation()
+    if (grip.current && live) onChange({ scale: Math.round(live.scale * 20) / 20, rot: Math.round(live.rot) })
+    grip.current = null; setLive(null)
+  }
+
   const p = pos || pin
+  const scale = live ? live.scale : pin.scale || 1
+  const rot = live ? live.rot : pos ? 0 : pin.rot
+  const inv = { transform: `scale(${1 / scale})` }
   return (
     <div
-      className={`pin ${pos ? 'dragging' : ''} ${editing ? 'editable' : ''}`}
-      style={{ left: p.x, top: p.y, transform: `rotate(${spin ?? (pos ? 0 : pin.rot)}deg) scale(${size || pin.scale || 1})`, touchAction: editing ? 'none' : 'pan-x' }}
+      className={`pin ${pos || live ? 'dragging' : ''} ${editing ? 'editable' : ''}`}
+      style={{ left: p.x, top: p.y, transform: `rotate(${rot}deg) scale(${scale})`, touchAction: editing ? 'none' : 'pan-x' }}
       onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
     >
-      {editing && <button className="pin-x" style={{ transform: `scale(${1 / (size || pin.scale || 1)})` }} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onRemove() }} aria-label="Remove from board"><Icon name="x" size={11} stroke={2.4} /></button>}
+      {editing && <button className="pin-x" style={inv} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onRemove() }} aria-label="Remove from board"><Icon name="x" size={11} stroke={2.4} /></button>}
       <PinView pin={pin} user={user} onVote={editing ? undefined : onVote} />
-      {editing && <span className="pin-grip turn" style={{ transform: `scale(${1 / (size || pin.scale || 1)})` }} onPointerDown={turnDown} onPointerMove={turnMove} onPointerUp={turnUp} onPointerCancel={turnUp} aria-label="Rotate" role="button"><Icon name="rotate" size={12} stroke={2.2} /></span>}
-      {editing && <span className="pin-grip" style={{ transform: `scale(${1 / (size || pin.scale || 1)})` }} onPointerDown={gripDown} onPointerMove={gripMove} onPointerUp={gripUp} onPointerCancel={gripUp} aria-label="Resize" role="button"><Icon name="resize" size={12} stroke={2.2} /></span>}
+      {editing && !hasTouch && <span className="pin-grip turn" style={inv} onPointerDown={gripDown('turn')} onPointerMove={gripMove} onPointerUp={gripUp} onPointerCancel={gripUp} aria-label="Rotate" role="button"><Icon name="rotate" size={12} stroke={2.2} /></span>}
+      {editing && !hasTouch && <span className="pin-grip" style={inv} onPointerDown={gripDown('size')} onPointerMove={gripMove} onPointerUp={gripUp} onPointerCancel={gripUp} aria-label="Resize" role="button"><Icon name="resize" size={12} stroke={2.2} /></span>}
     </div>
   )
 }
@@ -248,6 +271,11 @@ const MENU = [
 export function Board({ state, dispatch, id, go, back, newMonth }) {
   const [menu, setMenu] = useState(false) // false | 'open' | 'closing'
   const [editing, setEditing] = useState(false)
+  const [editTip, setEditTip] = useState(false)
+  const enterEdit = () => {
+    setEditing(true)
+    if (hasTouch && !state.editTipSeen) { setEditTip(true); dispatch({ type: 'set', patch: { editTipSeen: true } }); setTimeout(() => setEditTip(false), 3500) }
+  }
   const openMenu = () => setMenu('open')
   const closeMenu = () => { setMenu('closing'); setTimeout(() => setMenu((m) => (m === 'closing' ? false : m)), 260) }
   const canvas = useRef(null)
@@ -291,10 +319,9 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
           </button>
           {pins.map((p) => (
             <DraggablePin
-              key={p.id} pin={p} user={user} editing={editing} onEdit={() => setEditing(true)}
+              key={p.id} pin={p} user={user} editing={editing} onEdit={enterEdit}
               onRemove={() => dispatch({ type: 'removePin', boardId: id, pinId: p.id })}
-              onResize={(scale) => dispatch({ type: 'updatePin', boardId: id, pinId: p.id, patch: { scale } })}
-              onRotate={(rot) => dispatch({ type: 'updatePin', boardId: id, pinId: p.id, patch: { rot } })}
+              onChange={(patch) => dispatch({ type: 'updatePin', boardId: id, pinId: p.id, patch })}
               onMove={(x, y) => { hintDone(); dispatch({ type: 'movePin', boardId: id, pinId: p.id, x, y }) }}
               onOpen={() => { hintDone(); go('pin', { id, pinId: p.id }) }}
               onVote={(option) => dispatch({ type: 'vote', boardId: id, pinId: p.id, option })}
@@ -303,12 +330,13 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
         </div>
       </div>
       <div className={`hintrow ${menu ? 'blurred' : ''}`}>
-        <span className="caps">{editing ? 'DRAG · RESIZE · TURN · × REMOVES' : pins.length ? 'TAP TO OPEN · HOLD TO EDIT' : 'PRESS + TO PIN SOMETHING'}</span>
+        <span className="caps">{editing ? (hasTouch ? 'DRAG · PINCH TO RESIZE · TWIST TO TURN' : 'DRAG · CORNERS RESIZE AND TURN · × REMOVES') : pins.length ? 'TAP TO OPEN · HOLD TO EDIT' : 'PRESS + TO PIN SOMETHING'}</span>
         {newMonth
           ? <button className="pill float honey" onClick={() => go('recaps', { id })}>Your {MONTH} recap <Icon name="arrow" size={12} stroke={2} /></button>
           : <button className="pill float honey" onClick={() => go('recaps', { id })}><Icon name="arrow" size={12} stroke={2} /> Recaps</button>}
       </div>
       {showHint && <button className="toast hint" onClick={hintDone}>Tap to open · hold to move</button>}
+      {editTip && <div className="toast hint">Pinch to resize · twist to turn</div>}
       {menu && (
         <div className={`addmenu ${menu === 'closing' ? 'closing' : ''}`} onClick={closeMenu} ref={placeBurst}>
           {MENU.map((m, i) => (
