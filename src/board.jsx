@@ -4,14 +4,14 @@ import { MONTH, NEXT_MONTH, TODAY, boardTitle, fileToDataUrl, friend, hasNews, t
 import { Art, Avatar, DateSticker, Icon, Logo, PinView, StatusBar } from './ui.jsx'
 
 // Home · Friends · + · Activity · Settings.
-export function BottomNav({ state, go, onPlus, open, closing, current, plusLabel = 'Pin something' }) {
+export function BottomNav({ state, go, onPlus, open, closing, dim, current, plusLabel = 'Pin something' }) {
   const tab = (name, icon, label, extra) => (
     <button className={`tab t-${name}`} onClick={() => go(name)} aria-current={current === name ? 'page' : undefined}>
       <span className="tabicon"><Icon name={icon} size={19} />{extra}</span><span>{label}</span>
     </button>
   )
   return (
-    <nav className={`bottomnav ${open || closing ? 'open' : ''}`}>
+    <nav className={`bottomnav ${open || closing ? 'open' : ''} ${dim ? 'dim' : ''}`}>
       {tab('home', 'home', 'HOME')}
       {tab('friends', 'friends', 'FRIENDS')}
       <button className="fab" onClick={onPlus} aria-label={open ? 'Close' : plusLabel}><Icon name={open ? 'x' : 'plus'} size={20} /></button>
@@ -115,37 +115,59 @@ export function NewBoard({ state, dispatch, go, back }) {
   )
 }
 
-function DraggablePin({ pin, user, onMove, onOpen, onVote }) {
+const HOLD_MS = 450
+
+// A pin on the board. In view mode a tap opens it and any swipe scrolls the board. Holding it for a moment
+// switches the board to edit mode with this pin already lifted; in edit mode pins drag and carry a × to remove them.
+function DraggablePin({ pin, user, editing, onEdit, onMove, onOpen, onRemove, onVote }) {
   const [pos, setPos] = useState(null)
   const start = useRef(null)
+  const hold = useRef(null)
+  const cancelHold = () => { clearTimeout(hold.current); hold.current = null }
+  const lift = (e, s) => { setPos({ x: s.x, y: s.y }); try { e.currentTarget.setPointerCapture(e.pointerId) } catch {} }
   const down = (e) => {
-    start.current = { px: e.clientX, py: e.clientY, x: pin.x, y: pin.y, moved: false }
-    e.currentTarget.setPointerCapture(e.pointerId)
+    const s = { px: e.clientX, py: e.clientY, x: pin.x, y: pin.y, moved: false, lifted: editing, target: e.currentTarget, pointerId: e.pointerId }
+    start.current = s
+    if (editing) { lift(e, s); return }
+    hold.current = setTimeout(() => {
+      if (!start.current) return
+      s.lifted = true
+      navigator.vibrate?.(12)
+      onEdit()
+      try { s.target.setPointerCapture(s.pointerId) } catch {}
+      setPos({ x: s.x, y: s.y })
+    }, HOLD_MS)
   }
   const move = (e) => {
     const s = start.current
     if (!s) return
     const dx = (e.clientX - s.px) / BOARD_ZOOM, dy = (e.clientY - s.py) / BOARD_ZOOM
-    if (!s.moved && Math.hypot(dx, dy) < 4) return
+    if (!s.lifted) {
+      if (Math.hypot(dx, dy) > 6) { cancelHold(); start.current = null } // a swipe: let the board scroll
+      return
+    }
+    if (!s.moved && Math.hypot(dx, dy) < 3) return
     s.moved = true
     setPos({ x: Math.max(-10, Math.min(1290, s.x + dx)), y: Math.max(0, Math.min(400, s.y + dy)) })
   }
   const up = () => {
+    cancelHold()
     const s = start.current
     start.current = null
     if (!s) return
-    if (s.moved && pos) onMove(pos.x, pos.y)
+    if (s.lifted) { if (s.moved && pos) onMove(pos.x, pos.y) }
     else onOpen()
     setPos(null)
   }
   const p = pos || pin
   return (
     <div
-      className={`pin ${pos ? 'dragging' : ''}`}
-      style={{ left: p.x, top: p.y, transform: `rotate(${pos ? 0 : pin.rot}deg)` }}
+      className={`pin ${pos ? 'dragging' : ''} ${editing ? 'editable' : ''}`}
+      style={{ left: p.x, top: p.y, transform: `rotate(${pos ? 0 : pin.rot}deg)`, touchAction: editing ? 'none' : 'pan-x' }}
       onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
     >
-      <PinView pin={pin} user={user} onVote={onVote} />
+      {editing && <button className="pin-x" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onRemove() }} aria-label="Remove from board"><Icon name="x" size={11} stroke={2.4} /></button>}
+      <PinView pin={pin} user={user} onVote={editing ? undefined : onVote} />
     </div>
   )
 }
@@ -177,6 +199,7 @@ const MENU = [
 
 export function Board({ state, dispatch, id, go, back, newMonth }) {
   const [menu, setMenu] = useState(false) // false | 'open' | 'closing'
+  const [editing, setEditing] = useState(false)
   const openMenu = () => setMenu('open')
   const closeMenu = () => { setMenu('closing'); setTimeout(() => setMenu((m) => (m === 'closing' ? false : m)), 260) }
   const canvas = useRef(null)
@@ -199,10 +222,19 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
     <div className="screen paper">
       <StatusBar />
       <header className="board-head">
-        <button className="plain" onClick={() => go('recaps', { id })} aria-label="Recaps"><Members board={board} user={user} /></button>
-        <h1 className="serif spaced">{boardTitle(board, user)}</h1>
+        {editing ? (
+          <>
+            <h1 className="serif spaced editing-title">Editing board</h1>
+            <button className="pill on" onClick={() => setEditing(false)}>Done</button>
+          </>
+        ) : (
+          <>
+            <button className="plain" onClick={() => go('recaps', { id })} aria-label="Recaps"><Members board={board} user={user} /></button>
+            <h1 className="serif spaced">{boardTitle(board, user)}</h1>
+          </>
+        )}
       </header>
-      <div className={`canvas ${menu ? 'blurred' : ''} ${more ? 'has-more' : ''}`} ref={canvas} onScroll={checkMore}>
+      <div className={`canvas ${menu ? 'blurred' : ''} ${more ? 'has-more' : ''} ${editing ? 'editing' : ''}`} ref={canvas} onScroll={checkMore} onClick={(e) => { if (editing && e.target === e.currentTarget.firstChild) setEditing(false) }}>
         <div className="canvas-inner" style={{ zoom: BOARD_ZOOM }}>
           {/* snap points every page width, so a swipe lands with a sliver of the next page showing */}
           {[0, 1, 2, 3].map((n) => <i key={n} className="snap" style={{ left: n * PAGE }} />)}
@@ -211,7 +243,8 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
           </button>
           {pins.map((p) => (
             <DraggablePin
-              key={p.id} pin={p} user={user}
+              key={p.id} pin={p} user={user} editing={editing} onEdit={() => setEditing(true)}
+              onRemove={() => dispatch({ type: 'removePin', boardId: id, pinId: p.id })}
               onMove={(x, y) => { hintDone(); dispatch({ type: 'movePin', boardId: id, pinId: p.id, x, y }) }}
               onOpen={() => { hintDone(); go('pin', { id, pinId: p.id }) }}
               onVote={(option) => dispatch({ type: 'vote', boardId: id, pinId: p.id, option })}
@@ -220,12 +253,12 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
         </div>
       </div>
       <div className={`hintrow ${menu ? 'blurred' : ''}`}>
-        <span className="caps">{pins.length ? 'TAP TO ZOOM · SWIPE FOR MORE' : 'PRESS + TO PIN SOMETHING'}</span>
+        <span className="caps">{editing ? 'DRAG TO MOVE · × TO REMOVE' : pins.length ? 'TAP TO OPEN · HOLD TO EDIT' : 'PRESS + TO PIN SOMETHING'}</span>
         {newMonth
           ? <button className="pill float honey" onClick={() => go('recaps', { id })}>Your {MONTH} recap <Icon name="arrow" size={12} stroke={2} /></button>
           : <button className="pill float honey" onClick={() => go('recaps', { id })}><Icon name="arrow" size={12} stroke={2} /> Recaps</button>}
       </div>
-      {showHint && <button className="toast hint" onClick={hintDone}>Drag to move · tap to open</button>}
+      {showHint && <button className="toast hint" onClick={hintDone}>Tap to open · hold to move</button>}
       {menu && (
         <div className={`addmenu ${menu === 'closing' ? 'closing' : ''}`} onClick={closeMenu} ref={placeBurst}>
           {MENU.map((m, i) => (
@@ -236,7 +269,7 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
           ))}
         </div>
       )}
-      <BottomNav state={state} go={go} open={menu === 'open'} closing={menu === 'closing'} onPlus={() => (menu === 'open' ? closeMenu() : openMenu())} />
+      <BottomNav state={state} go={go} dim={editing} open={menu === 'open'} closing={menu === 'closing'} onPlus={() => (menu === 'open' ? closeMenu() : openMenu())} />
     </div>
   )
 }
@@ -287,9 +320,6 @@ export function PinDetail({ state, dispatch, id, pinId, go, back }) {
         )}
         {pin.by === 'me' && pin.type === 'ticket' && (
           <button className="pill float edit" onClick={() => go('ticket', { id, pinId })}>Edit ticket</button>
-        )}
-        {pin.by === 'me' && (
-          <button className="plain tiny danger" onClick={() => { dispatch({ type: 'removePin', boardId: id, pinId }); back() }}>Take this off the board</button>
         )}
       </div>
     </div>
