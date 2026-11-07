@@ -281,6 +281,8 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
   const board = state.boards.find((b) => b.id === id)
   const { user } = state
   const pins = newMonth || !board ? [] : board.pins
+  // the board grows to the right as pins are added, in whole pages, never narrower than four pages
+  const boardWidth = Math.max(4 * PAGE, Math.ceil((Math.max(0, ...pins.map((p) => p.x + 150)) + 20) / PAGE) * PAGE)
   // Shown once, after the first thing you pin yourself. Any touch on a pin (or 8 seconds) retires it for good.
   const showHint = state.dragHint === 'show' && pins.length > 0 && !menu
   const hintDone = () => state.dragHint === 'show' && dispatch({ type: 'set', patch: { dragHint: 'done' } })
@@ -307,9 +309,9 @@ export function Board({ state, dispatch, id, go, back, newMonth }) {
         )}
       </header>
       <div className={`canvas ${menu ? 'blurred' : ''} ${more ? 'has-more' : ''} ${editing ? 'editing' : ''}`} ref={canvas} onScroll={checkMore} onClick={(e) => { if (editing && e.target === e.currentTarget.firstChild) setEditing(false) }}>
-        <div className="canvas-inner" style={{ zoom: BOARD_ZOOM }}>
+        <div className="canvas-inner" style={{ zoom: BOARD_ZOOM, width: boardWidth }}>
           {/* snap points every page width, so a swipe lands with a sliver of the next page showing */}
-          {[0, 1, 2, 3].map((n) => <i key={n} className="snap" style={{ left: n * PAGE }} />)}
+          {Array.from({ length: Math.ceil(boardWidth / PAGE) }, (_, n) => <i key={n} className="snap" style={{ left: n * PAGE }} />)}
           <button className="plain datebtn" onClick={() => go('recaps', { id })} aria-label="Open recaps">
             <DateSticker month={newMonth ? NEXT_MONTH : MONTH} day={newMonth ? 1 : TODAY} />
           </button>

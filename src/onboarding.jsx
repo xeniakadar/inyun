@@ -76,7 +76,7 @@ const SLIDES = [
         </svg>
         <span className="orb a" /><span className="orb b" />
         <span className="chip c1">{timeIn('America/New_York')} New York</span>
-        <span className="chip c2">{timeIn('Europe/Budapest')} Budapest</span>
+        <span className="chip c2">{timeIn('Asia/Singapore')} Singapore</span>
       </div>
     ),
   },
@@ -209,7 +209,7 @@ export function Setup({ user, dispatch, onNext, onBack }) {
   )
 }
 
-const PURPOSES = ['Long distance besties', 'Family', 'A trip with friends', 'My own journal', 'A vision board', 'Tracking my months']
+const PURPOSES = ['Long distance besties', 'Relationship', 'Family', 'A trip with friends', 'My own journal', 'A vision board', 'Tracking my months']
 
 export function Purpose({ state, dispatch, onNext, onBack }) {
   const toggle = (p) => {
