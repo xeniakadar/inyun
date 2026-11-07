@@ -69,6 +69,11 @@ const SLIDES = [
     body: 'Leave notes, voice notes and photos on a shared board, whatever time it is where they are.',
     art: () => (
       <div className="ill ill-besties">
+        {/* two threads, one from each side, draw themselves in behind the circles as the circles glide together */}
+        <svg className="threads" viewBox="0 0 390 340" fill="none" strokeWidth="2.400" strokeLinecap="round">
+          <path className="thread t1" pathLength="1" stroke="#c96b5e" d="M-20 118 C 40 60, 80 210, 130 172 C 160 150, 180 140, 196 166" />
+          <path className="thread t2" pathLength="1" stroke="#b85a52" d="M410 232 C 350 300, 320 120, 262 168 C 235 190, 215 196, 196 170" />
+        </svg>
         <span className="orb a" /><span className="orb b" />
         <span className="chip c1">{timeIn('America/New_York')} New York</span>
         <span className="chip c2">{timeIn('Europe/Budapest')} Budapest</span>
@@ -82,7 +87,7 @@ const SLIDES = [
       <div className="ill ill-trip">
         <svg viewBox="0 0 390 300" fill="none" stroke="#6b7c8f" strokeDasharray="3 5" strokeWidth="1.200"><path d="M-10 250C80 110 250 80 400 120" /><path d="M-10 300C110 180 260 160 400 190" /></svg>
         {[[120, 150, '#7fc0a8'], [205, 125, '#7fb2d8'], [290, 135, '#8f95e6'], [55, 215, '#6fa4d6'], [178, 228, '#6fb0d0'], [272, 218, '#86cbb0'], [78, 280, '#7fc6a0']].map(([x, y, c], i) => (
-          <span key={i} className="blob" style={{ left: x, top: y, background: c }} />
+          <span key={i} className="blob" style={{ left: x, top: y, background: c, '--i': i }} />
         ))}
         <span className="chip c1">Lisbon, in 43 days</span>
         <span className="chip c2">Dinner, 8 pm</span>
@@ -94,9 +99,10 @@ const SLIDES = [
     body: 'A visual diary, a vision board, or a place to track the months. Your own board, kept for you.',
     art: () => (
       <div className="ill ill-journal">
-        <span className="card k1"><Art kind="flowers" /></span>
-        <span className="card k2"><Art kind="fun2" /></span>
-        <span className="card k3"><Art kind="sushi" /></span>
+        {/* outer span pops in (fade + grow); inner card carries the tilt and the slow wiggle, so the two never fight */}
+        <span className="pop k1" style={{ '--n': 0 }}><span className="card" style={{ '--r': '-7deg' }}><Art kind="flowers" /></span></span>
+        <span className="pop k2" style={{ '--n': 1 }}><span className="card" style={{ '--r': '4deg' }}><Art kind="fun2" /></span></span>
+        <span className="pop k3" style={{ '--n': 2 }}><span className="card" style={{ '--r': '-1deg' }}><Art kind="sushi" /></span></span>
       </div>
     ),
   },
@@ -106,7 +112,8 @@ const SLIDES = [
     cta: 'Set up my board',
     art: () => (
       <div className="ill ill-recap">
-        <svg viewBox="0 0 390 300" fill="none" stroke="#3a3528" strokeDasharray="2 5" strokeWidth="1.600" strokeLinecap="round"><path d="M0 232c60-8 90 14 150 2s70-52 130-58 80-10 110-14" /></svg>
+        <svg viewBox="0 0 390 300" fill="none" stroke="#3a3528" strokeDasharray="2 5" strokeWidth="1.600" strokeLinecap="round"><path className="route" d="M0 232c60-8 90 14 150 2s70-52 130-58 80-10 110-14" /></svg>
+        {/* the two of you travel the dotted route from OCT to DEC, month after month */}
         <span className="orb a" /><span className="orb b" />
         <span className="chip c1">OCT</span><span className="chip c2">NOV</span><span className="chip c3">DEC</span>
       </div>
