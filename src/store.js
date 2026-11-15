@@ -57,7 +57,6 @@ const novemberPins = () => [
   { id: 'p5', type: 'note', text: 'I miss you...', color: NOTE_COLORS[0], x: 166, y: 190, rot: -3, day: 13, by: 'me' },
   { id: 'p6', type: 'photo', art: 'sushi', x: 364, y: 24, rot: -3, day: 18, by: 'me' },
   { id: 'p7', type: 'photo', art: 'flowers', x: 520, y: 30, rot: 4, day: 18, by: 'alex' },
-  { id: 'p8', type: 'strip', x: 306, y: 24, rot: 2, day: 24, by: 'me' },
   { id: 'p9', type: 'license', x: 364, y: 190, rot: -2, day: 24, by: 'alex' },
   { id: 'p10', type: 'poll', q: 'miss me?', options: ['yes', 'also yes'], x: 520, y: 196, rot: 3, day: 26, by: 'alex' },
   { id: 'p11', type: 'receipt', x: 1420, y: 190, rot: 1, day: 28, by: 'me' },
